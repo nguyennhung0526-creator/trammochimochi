@@ -2,7 +2,7 @@ import shopeeClick from "@/assets/shopee-click.png.asset.json";
 
 const DEFAULT_SHOPEE_URL = "https://spf.shopee.vn/16cHicV6W";
 
-export function ShopeeGate({ onUnlock, url }: { onUnlock: () => void; url?: string }) {
+export function ShopeeGate({ onUnlock, url }: { onUnlock: () => void; url?: string | undefined }) {
   const shopeeUrl = url ?? DEFAULT_SHOPEE_URL;
   const handleClick = () => {
     window.open(shopeeUrl, "_blank", "noopener,noreferrer");
