@@ -18,6 +18,7 @@ export type Story = {
   slug: string;
   title: string;
   author?: string;
+  translator?: string;
   status: "Hoàn Thành" | "Đang ra" | "Chờ full";
   views: number;
   cover: string;
