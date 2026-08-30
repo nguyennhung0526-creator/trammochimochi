@@ -61,7 +61,7 @@ function StoryDetail() {
             <div className="min-w-0">
               <h1 className="text-xl font-bold uppercase md:text-2xl">{story.title}</h1>
               <dl className="mt-4 grid gap-2 text-sm">
-                <Row label="作者" value={<span className="text-primary">{story.author}</span>} />
+                <Row label="Tác Giả" value={<span className="text-primary">{story.author}</span>} />
                 <Row label="Chuyển ngữ" value={story.translator} />
                 <Row label="Tình trạng" value={<StatusPill status={story.status} />} />
                 <Row label="Chương mới nhất" value={String(story.chapters.length)} />
