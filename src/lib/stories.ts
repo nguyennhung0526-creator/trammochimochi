@@ -33,10 +33,11 @@ export type Story = {
 
 export async function fetchStoriesFromSheets(): Promise<Story[]> {
   try {
-    const sheetId = "1XlR_p-f15Ily4OqXJ-3T5L3jV7-fR2cW";
+    const sheetId = "1Z6b0hFDR0NgzDA-rPg9LibyK9xzEm_uclp27DI322j4";
     const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
     const res = await fetch(gvizUrl);
+    if (!res.ok) throw new Error(`Sheets HTTP ${res.status}`);
     const text = await res.text();
     const jsonString = text.substring(47, text.length - 2);
     const data = JSON.parse(jsonString);
