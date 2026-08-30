@@ -26,7 +26,22 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const hot = stories.filter((s) => s.hot);
-  const featured = stories[0]!;
+  const featured = stories[0];
+
+  if (!featured) {
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <main className="mx-auto max-w-6xl px-4 py-16">
+          <h1 className="text-2xl font-bold text-primary">Trạm Mochi Mochi</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Kho truyện đang được cập nhật, bạn quay lại sau nhé!
+          </p>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
