@@ -65,7 +65,7 @@ function Home() {
               <Sparkles className="h-3.5 w-3.5" /> Truyện nổi bật hôm nay
             </span>
             <h1 className="mt-4 text-2xl font-bold md:text-4xl">{featured.title}</h1>
-            <p className="mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
+            <p className="mt-3 line-clamp-4 whitespace-pre-line text-sm text-muted-foreground md:text-base">
               {featured.summary}
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
