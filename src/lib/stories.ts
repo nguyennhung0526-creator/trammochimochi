@@ -93,7 +93,7 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
   }
 }
 
-export const stories: Story[] = [];
+export const stories: Story[] = [mayTanTroiLaiSang];
 
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
 
