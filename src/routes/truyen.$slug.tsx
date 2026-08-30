@@ -114,7 +114,7 @@ function StoryDetail() {
 
           <section className="pastel-panel mt-6 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-primary">Giới thiệu</h2>
-            <p className="reading-body mt-2 text-muted-foreground">{story.summary}</p>
+            <p className="reading-body mt-2 whitespace-pre-line text-muted-foreground">{story.summary}</p>
           </section>
 
           <section className="pastel-panel mt-6 p-4 sm:p-6">
