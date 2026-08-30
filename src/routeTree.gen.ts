@@ -14,6 +14,8 @@ import { Route as TaiKhoanRouteImport } from './routes/tai-khoan'
 import { Route as TimKiemRouteImport } from './routes/tim-kiem'
 import { Route as DanhSachLoaiRouteImport } from './routes/danh-sach.$loai'
 import { Route as TheLoaiTenRouteImport } from './routes/the-loai.$ten'
+import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
+import { Route as DocSlugSoRouteImport } from './routes/doc.$slug.$so'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +42,16 @@ const TheLoaiTenRoute = TheLoaiTenRouteImport.update({
   path: '/the-loai/$ten',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TruyenSlugRoute = TruyenSlugRouteImport.update({
+  id: '/truyen/$slug',
+  path: '/truyen/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocSlugSoRoute = DocSlugSoRouteImport.update({
+  id: '/doc/$slug/$so',
+  path: '/doc/$slug/$so',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +59,8 @@ export interface FileRoutesByFullPath {
   '/tim-kiem': typeof TimKiemRoute
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
+  '/truyen/$slug': typeof TruyenSlugRoute
+  '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +68,8 @@ export interface FileRoutesByTo {
   '/tim-kiem': typeof TimKiemRoute
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
+  '/truyen/$slug': typeof TruyenSlugRoute
+  '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +78,28 @@ export interface FileRoutesById {
   '/tim-kiem': typeof TimKiemRoute
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
+  '/truyen/$slug': typeof TruyenSlugRoute
+  '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/tai-khoan' | '/tim-kiem' | '/danh-sach/$loai' | '/the-loai/$ten'
+    | '/'
+    | '/tai-khoan'
+    | '/tim-kiem'
+    | '/danh-sach/$loai'
+    | '/the-loai/$ten'
+    | '/truyen/$slug'
+    | '/doc/$slug/$so'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tai-khoan' | '/tim-kiem' | '/danh-sach/$loai' | '/the-loai/$ten'
+  to:
+    | '/'
+    | '/tai-khoan'
+    | '/tim-kiem'
+    | '/danh-sach/$loai'
+    | '/the-loai/$ten'
+    | '/truyen/$slug'
+    | '/doc/$slug/$so'
   id:
     | '__root__'
     | '/'
@@ -76,6 +107,8 @@ export interface FileRouteTypes {
     | '/tim-kiem'
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
+    | '/truyen/$slug'
+    | '/doc/$slug/$so'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -84,6 +117,8 @@ export interface RootRouteChildren {
   TimKiemRoute: typeof TimKiemRoute
   DanhSachLoaiRoute: typeof DanhSachLoaiRoute
   TheLoaiTenRoute: typeof TheLoaiTenRoute
+  TruyenSlugRoute: typeof TruyenSlugRoute
+  DocSlugSoRoute: typeof DocSlugSoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -123,6 +158,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TheLoaiTenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/truyen/$slug': {
+      id: '/truyen/$slug'
+      path: '/truyen/$slug'
+      fullPath: '/truyen/$slug'
+      preLoaderRoute: typeof TruyenSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doc/$slug/$so': {
+      id: '/doc/$slug/$so'
+      path: '/doc/$slug/$so'
+      fullPath: '/doc/$slug/$so'
+      preLoaderRoute: typeof DocSlugSoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -132,6 +181,8 @@ const rootRouteChildren: RootRouteChildren = {
   TimKiemRoute: TimKiemRoute,
   DanhSachLoaiRoute: DanhSachLoaiRoute,
   TheLoaiTenRoute: TheLoaiTenRoute,
+  TruyenSlugRoute: TruyenSlugRoute,
+  DocSlugSoRoute: DocSlugSoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
