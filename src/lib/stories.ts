@@ -5,6 +5,8 @@ import cover2 from "@/assets/cover-2.jpg";
 import cover3 from "@/assets/cover-3.jpg";
 import cover4 from "@/assets/cover-4.jpg";
 
+import { mayTanTroiLaiSang } from "./story-may-tan";
+
 // Link Google Sheets Kho truyện Mochi của bạn
 const GOOGLE_SHEETS_LINK = "https://docs.google.com/spreadsheets/d/1Z6b0hFDR0NgzDA-rPg9LibyK9xzEm_uclp27DI322j4/edit?usp=sharing";
 
@@ -18,6 +20,7 @@ export type Story = {
   slug: string;
   title: string;
   author?: string;
+  translator?: string;
   status: "Hoàn Thành" | "Đang ra" | "Chờ full";
   views: number;
   cover: string;
@@ -93,7 +96,7 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
   }
 }
 
-export const stories: Story[] = [];
+export const stories: Story[] = [mayTanTroiLaiSang];
 
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
 
