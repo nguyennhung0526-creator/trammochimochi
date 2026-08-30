@@ -47,8 +47,19 @@ export const stories: Story[] = [
     views: 16251,
     cover: cover2,
     tags: ["Ngôn Tình", "BE", "Hiện Đại", "Ngược Tâm", "SE", "Tra Nam"],
-    summary:
-      "Nếu biết trước kết cục sẽ là chia ly, liệu chúng ta có còn dũng cảm gặp nhau lần đầu? Một câu chuyện dịu dàng và day dứt về tuổi trẻ, về những lời chưa nói và những chuyến tàu đã đi.",
+    summary: `Phụ Văn Châu hận mẹ tôi vì cho rằng bà đã hại ch mối tình đầu của anh.
+
+Để trả thù mẹ, anh dành ra một năm trời để theo đuổi và có được tôi.
+
+Ngày tôi đồng ý lời tỏ tình, anh lại cố tình sỉ nhục mẹ tôi ngay trước mặt mọi người:
+
+"Dì à, chẳng phải dì ghét nhất là 'tiểu tam' sao? Bây giờ con gái dì cũng là hạng người đó rồi đấy."
+
+Mẹ tôi bị xuất huyết não ngay tại chỗ, hôn mê bất tỉnh.
+
+Sau đó, đúng như tâm nguyện của anh, vì để có tiền chi trả viện phí đắt đỏ, tôi đã trở thành tình nhân nhỏ của người anh em chí cốt của anh.
+
+Vậy mà, anh lại quỳ gối trước mặt tôi, nước mắt giàn giụa nói rằng mình hối hận rồi.`,
     chapters: lorem("Chi Bằng Không Gặp"),
     hot: true,
   },
