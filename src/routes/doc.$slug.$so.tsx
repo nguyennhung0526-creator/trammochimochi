@@ -1,8 +1,13 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
+import { useEffect, useState } from "react";
 
+import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { getStory } from "@/lib/stories";
+
+const GATED_CHAPTER = 2;
+const unlockKey = (slug: string) => `mochi-unlock:${slug}:${GATED_CHAPTER}`;
 
 export const Route = createFileRoute("/doc/$slug/$so")({
   loader: ({ params }) => {
@@ -34,6 +39,20 @@ function Reader() {
   const { story, chapter } = Route.useLoaderData();
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
   const next = chapter.index < story.chapters.length ? chapter.index + 1 : null;
+  const isGated = chapter.index === GATED_CHAPTER;
+  const [unlocked, setUnlocked] = useState(false);
+
+  useEffect(() => {
+    if (!isGated) return;
+    setUnlocked(localStorage.getItem(unlockKey(story.slug)) === "1");
+  }, [isGated, story.slug]);
+
+  const handleUnlock = () => {
+    localStorage.setItem(unlockKey(story.slug), "1");
+    setUnlocked(true);
+  };
+
+  const locked = isGated && !unlocked;
 
   return (
     <div className="min-h-screen">
@@ -45,17 +64,24 @@ function Reader() {
           </Link>
           <span> / {chapter.title}</span>
         </nav>
-        <article className="pastel-panel mt-4 p-5 sm:p-8">
-          <h1 className="text-center text-xl font-bold md:text-2xl">
-            {story.title}
-            <span className="mt-1 block text-base font-semibold text-primary">{chapter.title}</span>
-          </h1>
-          <div className="reading-body mt-6 space-y-5">
-            {chapter.paragraphs.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </article>
+        {locked ? (
+          <ShopeeGate onUnlock={handleUnlock} />
+        ) : (
+          <article className="pastel-panel mt-4 p-5 sm:p-8">
+            <h1 className="text-center text-xl font-bold md:text-2xl">
+              {story.title}
+              <span className="mt-1 block text-base font-semibold text-primary">
+                {chapter.title}
+              </span>
+            </h1>
+            <div className="reading-body mt-6 space-y-5">
+              {chapter.paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </article>
+        )}
+
 
         <div className="mt-6 grid grid-cols-3 items-center gap-3">
           {prev ? (
