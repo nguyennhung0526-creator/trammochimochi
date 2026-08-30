@@ -23,6 +23,8 @@ export type Story = {
   summary: string;
   chapters: Chapter[];
   hot?: boolean;
+  /** Liên kết ủng hộ hiển thị ở màn hình khóa trước Chương 2 */
+  shopeeUrl?: string;
 };
 
 const lorem = (title: string): Chapter[] =>
