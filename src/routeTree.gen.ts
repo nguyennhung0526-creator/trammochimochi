@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TaiKhoanRouteImport } from './routes/tai-khoan'
+import { Route as TimKiemRouteImport } from './routes/tim-kiem'
+import { Route as DanhSachLoaiRouteImport } from './routes/danh-sach.$loai'
+import { Route as TheLoaiTenRouteImport } from './routes/the-loai.$ten'
+import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
+import { Route as DocSlugSoRouteImport } from './routes/doc.$slug.$so'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TaiKhoanRoute = TaiKhoanRouteImport.update({
+  id: '/tai-khoan',
+  path: '/tai-khoan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimKiemRoute = TimKiemRouteImport.update({
+  id: '/tim-kiem',
+  path: '/tim-kiem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DanhSachLoaiRoute = DanhSachLoaiRouteImport.update({
+  id: '/danh-sach/$loai',
+  path: '/danh-sach/$loai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TheLoaiTenRoute = TheLoaiTenRouteImport.update({
+  id: '/the-loai/$ten',
+  path: '/the-loai/$ten',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TruyenSlugRoute = TruyenSlugRouteImport.update({
+  id: '/truyen/$slug',
+  path: '/truyen/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocSlugSoRoute = DocSlugSoRouteImport.update({
+  id: '/doc/$slug/$so',
+  path: '/doc/$slug/$so',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/tai-khoan': typeof TaiKhoanRoute
+  '/tim-kiem': typeof TimKiemRoute
+  '/danh-sach/$loai': typeof DanhSachLoaiRoute
+  '/the-loai/$ten': typeof TheLoaiTenRoute
+  '/truyen/$slug': typeof TruyenSlugRoute
+  '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/tai-khoan': typeof TaiKhoanRoute
+  '/tim-kiem': typeof TimKiemRoute
+  '/danh-sach/$loai': typeof DanhSachLoaiRoute
+  '/the-loai/$ten': typeof TheLoaiTenRoute
+  '/truyen/$slug': typeof TruyenSlugRoute
+  '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/tai-khoan': typeof TaiKhoanRoute
+  '/tim-kiem': typeof TimKiemRoute
+  '/danh-sach/$loai': typeof DanhSachLoaiRoute
+  '/the-loai/$ten': typeof TheLoaiTenRoute
+  '/truyen/$slug': typeof TruyenSlugRoute
+  '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/tai-khoan'
+    | '/tim-kiem'
+    | '/danh-sach/$loai'
+    | '/the-loai/$ten'
+    | '/truyen/$slug'
+    | '/doc/$slug/$so'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/tai-khoan'
+    | '/tim-kiem'
+    | '/danh-sach/$loai'
+    | '/the-loai/$ten'
+    | '/truyen/$slug'
+    | '/doc/$slug/$so'
+  id:
+    | '__root__'
+    | '/'
+    | '/tai-khoan'
+    | '/tim-kiem'
+    | '/danh-sach/$loai'
+    | '/the-loai/$ten'
+    | '/truyen/$slug'
+    | '/doc/$slug/$so'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TaiKhoanRoute: typeof TaiKhoanRoute
+  TimKiemRoute: typeof TimKiemRoute
+  DanhSachLoaiRoute: typeof DanhSachLoaiRoute
+  TheLoaiTenRoute: typeof TheLoaiTenRoute
+  TruyenSlugRoute: typeof TruyenSlugRoute
+  DocSlugSoRoute: typeof DocSlugSoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tai-khoan': {
+      id: '/tai-khoan'
+      path: '/tai-khoan'
+      fullPath: '/tai-khoan'
+      preLoaderRoute: typeof TaiKhoanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tim-kiem': {
+      id: '/tim-kiem'
+      path: '/tim-kiem'
+      fullPath: '/tim-kiem'
+      preLoaderRoute: typeof TimKiemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/danh-sach/$loai': {
+      id: '/danh-sach/$loai'
+      path: '/danh-sach/$loai'
+      fullPath: '/danh-sach/$loai'
+      preLoaderRoute: typeof DanhSachLoaiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/the-loai/$ten': {
+      id: '/the-loai/$ten'
+      path: '/the-loai/$ten'
+      fullPath: '/the-loai/$ten'
+      preLoaderRoute: typeof TheLoaiTenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/truyen/$slug': {
+      id: '/truyen/$slug'
+      path: '/truyen/$slug'
+      fullPath: '/truyen/$slug'
+      preLoaderRoute: typeof TruyenSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doc/$slug/$so': {
+      id: '/doc/$slug/$so'
+      path: '/doc/$slug/$so'
+      fullPath: '/doc/$slug/$so'
+      preLoaderRoute: typeof DocSlugSoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TaiKhoanRoute: TaiKhoanRoute,
+  TimKiemRoute: TimKiemRoute,
+  DanhSachLoaiRoute: DanhSachLoaiRoute,
+  TheLoaiTenRoute: TheLoaiTenRoute,
+  TruyenSlugRoute: TruyenSlugRoute,
+  DocSlugSoRoute: DocSlugSoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
