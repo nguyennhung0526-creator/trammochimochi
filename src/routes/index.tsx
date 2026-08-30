@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const hot = stories.filter((s) => s.hot);
-  const featured = stories[0];
+  const featured = stories[0]!;
 
   return (
     <div className="min-h-screen">

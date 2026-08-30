@@ -1,3 +1,5 @@
+import type { LinkProps } from "@tanstack/react-router";
+
 import cover1 from "@/assets/cover-1.jpg";
 import cover2 from "@/assets/cover-2.jpg";
 import cover3 from "@/assets/cover-3.jpg";
@@ -95,10 +97,10 @@ export const stories: Story[] = [
 
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
 
-export const navItems = [
-  { label: "Trang chủ", to: "/" },
-  { label: "Ngôn Tình", to: "/the-loai/ngon-tinh" },
-  { label: "Truyện hoàn thành", to: "/danh-sach/hoan-thanh" },
-  { label: "Truyện chờ full", to: "/danh-sach/cho-full" },
-  { label: "Truyện hot", to: "/danh-sach/hot" },
-] as const;
+export const navItems: { label: string; link: LinkProps }[] = [
+  { label: "Trang chủ", link: { to: "/" } },
+  { label: "Ngôn Tình", link: { to: "/the-loai/$ten", params: { ten: "ngon-tinh" } } },
+  { label: "Truyện hoàn thành", link: { to: "/danh-sach/$loai", params: { loai: "hoan-thanh" } } },
+  { label: "Truyện chờ full", link: { to: "/danh-sach/$loai", params: { loai: "cho-full" } } },
+  { label: "Truyện hot", link: { to: "/danh-sach/$loai", params: { loai: "hot" } } },
+];

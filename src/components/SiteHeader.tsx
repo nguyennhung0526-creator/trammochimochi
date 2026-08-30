@@ -77,9 +77,9 @@ export function SiteHeader() {
       <nav className="hidden bg-secondary/70 md:block">
         <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-1 px-4 py-1">
           {navItems.map((item) => (
-            <li key={item.to}>
+            <li key={item.label}>
               <Link
-                to={item.to}
+                {...item.link}
                 className="block rounded-full px-4 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-card"
                 activeProps={{ className: "bg-card text-primary" }}
               >
@@ -94,9 +94,9 @@ export function SiteHeader() {
         <nav className="border-t border-border bg-card px-4 py-3 md:hidden">
           <ul className="grid gap-1">
             {navItems.map((item) => (
-              <li key={item.to}>
+              <li key={item.label}>
                 <Link
-                  to={item.to}
+                  {...item.link}
                   onClick={() => setOpen(false)}
                   className="block rounded-xl px-3 py-2 text-sm font-semibold text-secondary-foreground hover:bg-secondary"
                 >
