@@ -1,5 +1,5 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
-import { AlertTriangle, BookOpen, ChevronRight, Eye, Link2 } from "lucide-react";
+import { BookOpen, ChevronRight, Eye, Link2 } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { StatusPill } from "@/components/StoryCard";
@@ -40,6 +40,11 @@ function StoryDetail() {
   const { story } = Route.useLoaderData();
   const others = stories.filter((s) => s.slug !== story.slug);
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert("Đã sao chép liên kết truyện!");
+  };
+
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -56,17 +61,9 @@ function StoryDetail() {
             <div className="min-w-0">
               <h1 className="text-xl font-bold uppercase md:text-2xl">{story.title}</h1>
               <dl className="mt-4 grid gap-2 text-sm">
-                <Row label="Tác giả" value={<span className="text-primary">{story.author}</span>} />
+                <Row label="作者" value={<span className="text-primary">{story.author}</span>} />
                 <Row label="Chuyển ngữ" value={story.translator} />
                 <Row label="Tình trạng" value={<StatusPill status={story.status} />} />
-                <Row
-                  label="Lượt xem"
-                  value={
-                    <span className="inline-flex items-center gap-1">
-                      <Eye className="h-4 w-4" /> {story.views.toLocaleString("vi-VN")}
-                    </span>
-                  }
-                />
                 <Row label="Chương mới nhất" value={String(story.chapters.length)} />
               </dl>
 
@@ -85,12 +82,13 @@ function StoryDetail() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <AlertTriangle className="h-4 w-4 text-destructive" /> Báo lỗi truyện
-                </span>
-                <span className="inline-flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
+                >
                   <Link2 className="h-4 w-4" /> Chia sẻ
-                </span>
+                </button>
               </div>
 
               <div className="mt-5 flex flex-wrap gap-3">
