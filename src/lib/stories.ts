@@ -4,6 +4,7 @@ import cover1 from "@/assets/cover-1.jpg";
 import cover2 from "@/assets/cover-2.jpg";
 import cover3 from "@/assets/cover-3.jpg";
 import cover4 from "@/assets/cover-4.jpg";
+import { mayTanTroiLaiSang } from "./story-may-tan";
 
 export type Chapter = {
   index: number;
@@ -40,6 +41,7 @@ const lorem = (title: string): Chapter[] =>
   }));
 
 export const stories: Story[] = [
+  mayTanTroiLaiSang,
   {
     slug: "chi-bang-khong-gap",
     title: "Chi Bằng Không Gặp",
