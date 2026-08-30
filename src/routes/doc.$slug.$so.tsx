@@ -1,8 +1,13 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
+import { useEffect, useState } from "react";
 
+import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { getStory } from "@/lib/stories";
+
+const GATED_CHAPTER = 2;
+const unlockKey = (slug: string) => `mochi-unlock:${slug}:${GATED_CHAPTER}`;
 
 export const Route = createFileRoute("/doc/$slug/$so")({
   loader: ({ params }) => {
