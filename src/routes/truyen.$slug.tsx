@@ -41,7 +41,9 @@ function StoryDetail() {
   const others = stories.filter((s) => s.slug !== story.slug);
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    const domain = "https://nguyennhung0526-creator.github.io/trammochimochi";
+    const fullUrl = `${domain}/truyen/${story.slug}`;
+    navigator.clipboard.writeText(fullUrl);
     alert("Đã sao chép liên kết truyện!");
   };
 
