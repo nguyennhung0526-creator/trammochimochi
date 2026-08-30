@@ -38,11 +38,7 @@ Quà sao?
 
 Nhưng món quà đó, và cả anh nữa, tôi đều không cần nữa rồi.`;
 
-const chuong1 = `${summary}
-
-——
-
-01.
+const chuong1 = `01.
 
 Đặt xong vé máy bay về nhà vào mười ngày sau, Tống Dực An vẫn chưa trở lại.
 
