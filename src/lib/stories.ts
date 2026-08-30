@@ -4,7 +4,9 @@ import cover1 from "@/assets/cover-1.jpg";
 import cover2 from "@/assets/cover-2.jpg";
 import cover3 from "@/assets/cover-3.jpg";
 import cover4 from "@/assets/cover-4.jpg";
-import { mayTanTroiLaiSang } from "./story-may-tan";
+
+// Thay bằng link Google Sheets công khai của bạn
+const GOOGLE_SHEETS_LINK = "https://docs.google.com/spreadsheets/d/1Z6b0hFDR0NgzDA-rPg9LibyK9xzEm_uclp27DI322j4/edit?usp=sharing";
 
 export type Chapter = {
   index: number;
@@ -15,8 +17,6 @@ export type Chapter = {
 export type Story = {
   slug: string;
   title: string;
-  author: string;
-  translator: string;
   status: "Hoàn Thành" | "Đang ra" | "Chờ full";
   views: number;
   cover: string;
@@ -24,90 +24,95 @@ export type Story = {
   summary: string;
   chapters: Chapter[];
   hot?: boolean;
-  /** Liên kết ủng hộ hiển thị ở màn hình khóa trước Chương 2 */
   shopeeUrl?: string;
 };
 
-const lorem = (title: string): Chapter[] =>
-  Array.from({ length: 4 }, (_, i) => ({
-    index: i + 1,
-    title: `Chương ${i + 1}`,
-    paragraphs: [
-      `${title} — Chương ${i + 1}. Mùa hạ năm ấy, tiếng ve rơi đầy trên con đường nhỏ dẫn về ký túc xá, nàng ngồi bên bậc thềm đá, tay giữ chặt lá thư chưa kịp gửi.`,
-      "Gió chiều lùa qua giàn hoa giấy, mang theo mùi mưa mới. Có những điều người ta chỉ dám nói khi biết chắc rằng người kia sẽ không bao giờ nghe thấy.",
-      "“Chi bằng không gặp,” nàng thì thầm, rồi mỉm cười. Nhưng trái tim vẫn cứ ngoan cố đập nhanh hơn một nhịp mỗi khi bóng người ấy đi ngang cửa lớp.",
-      "Đêm đó, thành phố sáng đèn như một chiếc vòng quay khổng lồ, chậm rãi quay giữa những giấc mơ còn chưa kịp đặt tên. Và câu chuyện của họ, mới chỉ vừa bắt đầu.",
-    ],
-  }));
+// Hàm lấy dữ liệu động từ Google Sheets
+export async function fetchStoriesFromSheets(): Promise<Story[]> {
+  try {
+    const idMatches = GOOGLE_SHEETS_LINK.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (!idMatches) return stories;
+    const sheetId = idMatches[1];
+    const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
+    const res = await fetch(gvizUrl);
+    const text = await res.text();
+    const jsonString = text.substring(47, text.length - 2);
+    const data = JSON.parse(jsonString);
+
+    const rows = data.table.rows;
+    const storiesMap: { [key: string]: Story } = {};
+
+    rows.forEach((row: any) => {
+      const slug = row.c[0]?.v || "";
+      if (!slug) return;
+
+      const title = row.c[1]?.v || "";
+      const status = (row.c[2]?.v || "Đang ra") as Story["status"];
+      const tags = row.c[3]?.v ? String(row.c[3].v).split(",").map(t => t.trim()) : [];
+      const summary = row.c[4]?.v || "";
+      const shopeeUrl = row.c[5]?.v || "";
+      const chapterIndex = Number(row.c[6]?.v || 1);
+      const chapterContent = row.c[7]?.v || "";
+
+      if (!storiesMap[slug]) {
+        storiesMap[slug] = {
+          slug,
+          title,
+          status,
+          views: 1000,
+          cover: cover1,
+          tags,
+          summary,
+          shopeeUrl,
+          chapters: []
+        };
+      }
+
+      // Tách nội dung chương thành các đoạn văn
+      const paragraphs = String(chapterContent)
+        .split("\n")
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+
+      const existingChapter = storiesMap[slug].chapters.find(c => c.index === chapterIndex);
+      if (existingChapter) {
+        existingChapter.paragraphs.push(...paragraphs);
+      } else {
+        storiesMap[slug].chapters.push({
+          index: chapterIndex,
+          title: `Chương ${chapterIndex}`,
+          paragraphs
+        });
+      }
+    });
+
+    return Object.values(storiesMap);
+  } catch (error) {
+    console.error("Lỗi tải Google Sheets:", error);
+    return stories;
+  }
+}
+
+// Dữ liệu dự phòng mặc định
 export const stories: Story[] = [
-  mayTanTroiLaiSang,
   {
-    slug: "chi-bang-khong-gap",
-    title: "Chi Bằng Không Gặp",
-    author: "Khuyết Danh",
-    translator: "Admin đang cập nhật",
+    slug: "may-tan-troi-lai-sang",
+    title: "Mây Tan Trời Lại Sáng",
     status: "Hoàn Thành",
-    views: 16251,
-    cover: cover2,
-    tags: ["Ngôn Tình", "BE", "Hiện Đại", "Ngược Tâm", "SE", "Tra Nam"],
-    summary: `Phụ Văn Châu hận mẹ tôi vì cho rằng bà đã hại ch mối tình đầu của anh.
-
-Để trả thù mẹ, anh dành ra một năm trời để theo đuổi và có được tôi.
-
-Ngày tôi đồng ý lời tỏ tình, anh lại cố tình sỉ nhục mẹ tôi ngay trước mặt mọi người:
-
-"Dì à, chẳng phải dì ghét nhất là 'tiểu tam' sao? Bây giờ con gái dì cũng là hạng người đó rồi đấy."
-
-Mẹ tôi bị xuất huyết não ngay tại chỗ, hôn mê bất tỉnh.
-
-Sau đó, đúng như tâm nguyện của anh, vì để có tiền chi trả viện phí đắt đỏ, tôi đã trở thành tình nhân nhỏ của người anh em chí cốt của anh.
-
-Vậy mà, anh lại quỳ gối trước mặt tôi, nước mắt giàn giụa nói rằng mình hối hận rồi.`,
-    chapters: lorem("Chi Bằng Không Gặp"),
-    hot: true,
-  },
-  {
-    slug: "tinh-yeu-em-danh-cho-anh-da-het-han",
-    title: "Tình Yêu Em Dành Cho Anh Đã Hết Hạn",
-    author: "Mộc Hạ",
-    translator: "Mochi Team",
-    status: "Hoàn Thành",
-    views: 12480,
-    cover: cover3,
-    tags: ["Ngôn Tình", "Hiện Đại", "Ngọt Sủng", "HE"],
-    summary:
-      "Em đã yêu anh suốt bảy năm. Đến năm thứ tám, em quyết định gói tình yêu ấy lại, dán nhãn hết hạn, rồi bước đi thật nhẹ.",
-    chapters: lorem("Tình Yêu Em Dành Cho Anh Đã Hết Hạn"),
-    hot: true,
-  },
-  {
-    slug: "hoa-anh-dao-thang-tu",
-    title: "Hoa Anh Đào Tháng Tư",
-    author: "Lam Thư",
-    translator: "Mochi Team",
-    status: "Đang ra",
-    views: 9310,
+    views: 20418,
     cover: cover1,
-    tags: ["Ngôn Tình", "Thanh Xuân Vườn Trường", "Ngọt", "HE"],
-    summary:
-      "Tháng tư, hoa anh đào rơi trên vai cậu bạn cùng bàn. Cô gái nhút nhát ấy đã giữ bí mật này suốt ba năm học.",
-    chapters: lorem("Hoa Anh Đào Tháng Tư"),
-  },
-  {
-    slug: "ho-sen-duoi-anh-trang",
-    title: "Hồ Sen Dưới Ánh Trăng",
-    author: "Thanh Vân",
-    translator: "Admin đang cập nhật",
-    status: "Chờ full",
-    views: 7602,
-    cover: cover4,
-    tags: ["Cổ Đại", "Tiên Hiệp", "Huyền Huyễn", "Ngược Tâm"],
-    summary:
-      "Một đêm rằm, sen nở giữa hồ tiên. Nàng bước ra từ ánh trăng, mang theo lời hứa của một kiếp trước chưa trọn.",
-    chapters: lorem("Hồ Sen Dưới Ánh Trăng"),
-    hot: true,
-  },
+    tags: ["Ngôn Tình", "Hiện Đại", "Ngược Tâm", "Tra Nam", "SE"],
+    summary: "Nội dung đang được đồng bộ từ Google Sheets...",
+    shopeeUrl: "https://shope.ee/",
+    chapters: [
+      {
+        index: 1,
+        title: "Chương 1",
+        paragraphs: ["Đang kết nối dữ liệu từ Google Sheets..."]
+      }
+    ]
+  }
 ];
 
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
