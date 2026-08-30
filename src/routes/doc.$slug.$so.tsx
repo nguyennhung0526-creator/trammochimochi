@@ -39,6 +39,20 @@ function Reader() {
   const { story, chapter } = Route.useLoaderData();
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
   const next = chapter.index < story.chapters.length ? chapter.index + 1 : null;
+  const isGated = chapter.index === GATED_CHAPTER;
+  const [unlocked, setUnlocked] = useState(false);
+
+  useEffect(() => {
+    if (!isGated) return;
+    setUnlocked(localStorage.getItem(unlockKey(story.slug)) === "1");
+  }, [isGated, story.slug]);
+
+  const handleUnlock = () => {
+    localStorage.setItem(unlockKey(story.slug), "1");
+    setUnlocked(true);
+  };
+
+  const locked = isGated && !unlocked;
 
   return (
     <div className="min-h-screen">
