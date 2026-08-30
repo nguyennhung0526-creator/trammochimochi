@@ -40,12 +40,10 @@ function StoryDetail() {
   const { story } = Route.useLoaderData();
   const others = stories.filter((s) => s.slug !== story.slug);
 
-  const handleShare = () => {
-    const domain = "https://nguyennhung0526-creator.github.io/trammochimochi";
-    const fullUrl = `${domain}/truyen/${story.slug}`;
-    navigator.clipboard.writeText(fullUrl);
-    alert("Đã sao chép liên kết truyện!");
-  };
+ const handleShare = () => {
+  navigator.clipboard.writeText(window.location.href);
+  alert("Đã sao chép liên kết truyện!");
+};
 
   return (
     <div className="min-h-screen">
