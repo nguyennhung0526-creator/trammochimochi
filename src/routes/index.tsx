@@ -1,9 +1,11 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Flame, Sparkles } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { StoryCard } from "@/components/StoryCard";
-import { stories } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
+import type { Story } from "@/lib/stories";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,10 +23,20 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(storiesQueryOptions),
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-8 text-sm text-muted-foreground">
+      Không tải được kho truyện: {error.message}
+    </div>
+  ),
+  pendingComponent: () => (
+    <div className="p-8 text-sm text-muted-foreground">Đang tải kho truyện…</div>
+  ),
   component: Home,
 });
 
 function Home() {
+  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
   const hot = stories.filter((s) => s.hot);
   const featured = stories[0];
 
@@ -90,7 +102,7 @@ function Home() {
   );
 }
 
-function Section({ title, items }: { title: string; items: typeof stories }) {
+function Section({ title, items }: { title: string; items: Story[] }) {
   return (
     <section className="mt-10">
       <h2 className="border-b-2 border-primary/40 pb-2 text-lg font-bold text-primary md:text-xl">
