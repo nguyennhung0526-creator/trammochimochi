@@ -5,7 +5,7 @@ import cover2 from "@/assets/cover-2.jpg";
 import cover3 from "@/assets/cover-3.jpg";
 import cover4 from "@/assets/cover-4.jpg";
 
-// Thay bằng link Google Sheets công khai của bạn
+// Link Google Sheets Kho truyện Mochi của bạn
 const GOOGLE_SHEETS_LINK = "https://docs.google.com/spreadsheets/d/1Z6b0hFDR0NgzDA-rPg9LibyK9xzEm_uclp27DI322j4/edit?usp=sharing";
 
 export type Chapter = {
@@ -17,6 +17,7 @@ export type Chapter = {
 export type Story = {
   slug: string;
   title: string;
+  author?: string;
   status: "Hoàn Thành" | "Đang ra" | "Chờ full";
   views: number;
   cover: string;
@@ -27,12 +28,9 @@ export type Story = {
   shopeeUrl?: string;
 };
 
-// Hàm lấy dữ liệu động từ Google Sheets
 export async function fetchStoriesFromSheets(): Promise<Story[]> {
   try {
-    const idMatches = GOOGLE_SHEETS_LINK.match(/\/d\/([a-zA-Z0-9-_]+)/);
-    if (!idMatches) return stories;
-    const sheetId = idMatches[1];
+    const sheetId = "1XlR_p-f15Ily4OqXJ-3T5L3jV7-fR2cW";
     const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
     const res = await fetch(gvizUrl);
@@ -47,20 +45,22 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
       const slug = row.c[0]?.v || "";
       if (!slug) return;
 
-      const title = row.c[1]?.v || "";
-      const status = (row.c[2]?.v || "Đang ra") as Story["status"];
-      const tags = row.c[3]?.v ? String(row.c[3].v).split(",").map(t => t.trim()) : [];
-      const summary = row.c[4]?.v || "";
-      const shopeeUrl = row.c[5]?.v || "";
-      const chapterIndex = Number(row.c[6]?.v || 1);
-      const chapterContent = row.c[7]?.v || "";
+      const title = row.c[1]?.v || "Mây Tan Trời Lại Sáng";
+      const author = row.c[2]?.v || "";
+      const status = (row.c[3]?.v || "Hoàn Thành") as Story["status"];
+      const tags = row.c[4]?.v ? String(row.c[4].v).split(",").map(t => t.trim()) : ["Ngôn Tình", "Hiện Đại"];
+      const summary = row.c[5]?.v || "";
+      const shopeeUrl = row.c[6]?.v || "";
+      const chapterIndex = Number(row.c[7]?.v || 1);
+      const chapterContent = row.c[8]?.v || "";
 
       if (!storiesMap[slug]) {
         storiesMap[slug] = {
           slug,
           title,
+          author,
           status,
-          views: 1000,
+          views: 20418,
           cover: cover1,
           tags,
           summary,
@@ -69,7 +69,6 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
         };
       }
 
-      // Tách nội dung chương thành các đoạn văn
       const paragraphs = String(chapterContent)
         .split("\n")
         .map(p => p.trim())
@@ -94,26 +93,7 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
   }
 }
 
-// Dữ liệu dự phòng mặc định
-export const stories: Story[] = [
-  {
-    slug: "may-tan-troi-lai-sang",
-    title: "Mây Tan Trời Lại Sáng",
-    status: "Hoàn Thành",
-    views: 20418,
-    cover: cover1,
-    tags: ["Ngôn Tình", "Hiện Đại", "Ngược Tâm", "Tra Nam", "SE"],
-    summary: "Nội dung đang được đồng bộ từ Google Sheets...",
-    shopeeUrl: "https://shope.ee/",
-    chapters: [
-      {
-        index: 1,
-        title: "Chương 1",
-        paragraphs: ["Đang kết nối dữ liệu từ Google Sheets..."]
-      }
-    ]
-  }
-];
+export const stories: Story[] = [];
 
 export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
 
