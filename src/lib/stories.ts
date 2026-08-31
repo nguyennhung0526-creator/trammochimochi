@@ -72,6 +72,7 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
           chapters: []
         };
       }
+      if (shopeeUrl) storiesMap[slug].shopeeUrl = shopeeUrl;
 
       const paragraphs = String(chapterContent)
         .split("\n")
