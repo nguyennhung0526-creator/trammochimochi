@@ -38,11 +38,7 @@ export const Route = createFileRoute("/doc/$slug/$so")({
 });
 
 function Reader() {
-  const { slug, so } = Route.useLoaderData();
-  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
-  const story = stories.find((s) => s.slug === slug);
-  const chapter = story?.chapters.find((c) => String(c.index) === so);
-  if (!story || !chapter) throw notFound();
+  const { story, chapter } = Route.useLoaderData();
 
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
   const next = chapter.index < story.chapters.length ? chapter.index + 1 : null;
@@ -51,7 +47,7 @@ function Reader() {
 
   useEffect(() => {
     setUnlocked(false);
-  }, [slug, so]);
+  }, [story.slug, chapter.index]);
 
   const locked = isGated && !unlocked;
 
