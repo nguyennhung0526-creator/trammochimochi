@@ -4,18 +4,18 @@ import { useEffect, useState } from "react";
 
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
-import { getStory } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
 
 const GATED_CHAPTER = 2;
-const unlockKey = (slug: string) => `mochi-unlock:${slug}:${GATED_CHAPTER}`;
 
 export const Route = createFileRoute("/doc/$slug/$so")({
-  loader: ({ params }) => {
-    const story = getStory(params.slug);
-    const chapter = story?.chapters.find((c) => String(c.index) === params.so);
-    if (!story || !chapter) throw notFound();
-    return { story, chapter };
-  },
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(storiesQueryOptions).then((stories) => {
+      const story = stories.find((s) => s.slug === params.slug);
+      const chapter = story?.chapters.find((c) => String(c.index) === params.so);
+      if (!story || !chapter) throw notFound();
+      return { story, chapter };
+    }),
   head: ({ loaderData }) => {
     const title = loaderData
       ? `${loaderData.story.title} - ${loaderData.chapter.title} — Trạm Mochi Mochi`
@@ -37,20 +37,15 @@ export const Route = createFileRoute("/doc/$slug/$so")({
 
 function Reader() {
   const { story, chapter } = Route.useLoaderData();
+
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
   const next = chapter.index < story.chapters.length ? chapter.index + 1 : null;
   const isGated = chapter.index === GATED_CHAPTER;
   const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
-    if (!isGated) return;
-    setUnlocked(localStorage.getItem(unlockKey(story.slug)) === "1");
-  }, [isGated, story.slug]);
-
-  const handleUnlock = () => {
-    localStorage.setItem(unlockKey(story.slug), "1");
-    setUnlocked(true);
-  };
+    setUnlocked(false);
+  }, [story.slug, chapter.index]);
 
   const locked = isGated && !unlocked;
 
@@ -64,8 +59,8 @@ function Reader() {
           </Link>
           <span> / {chapter.title}</span>
         </nav>
-        {locked ? (
-          <ShopeeGate onUnlock={handleUnlock} url={story.shopeeUrl} />
+        {locked && story.shopeeUrl ? (
+          <ShopeeGate onUnlock={() => setUnlocked(true)} url={story.shopeeUrl} />
         ) : (
           <article className="pastel-panel mt-4 p-5 sm:p-8">
             <h1 className="text-center text-xl font-bold md:text-2xl">

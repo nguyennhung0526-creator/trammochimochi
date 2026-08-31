@@ -904,8 +904,6 @@ export const mayTanTroiLaiSang: Story = {
   tags: ["Ngôn Tình", "Hiện Đại", "Ngược Tâm", "Tra Nam", "SE"],
   summary,
   hot: true,
-  shopeeUrl:
-    "https://shop.tiktok.com/vn/pdp/1732106854767560082?_d=f4ajf89j3e18fh&_svg=1&chain_key=%7B%22t%22%3A1%2C%22k%22%3A%22000000000000000007679865226787129109%22%2C%22sc%22%3A%22copy%22%7D&checksum=0d367921894163f403a46e25d8ba7ab6b0b2b920b2ee45c420f3dde83f69adb6&tt_from=copy&u_code=E5JF7L7C67F979&unique_id=trammochimochi&utm_campaign=client_share&utm_medium=ios&utm_source=copy",
   chapters: [
     { index: 1, title: "Chương 1", paragraphs: toParagraphs(chuong1) },
     { index: 2, title: "Chương 2", paragraphs: toParagraphs(chuong2) },
