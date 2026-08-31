@@ -37,8 +37,10 @@ export const Route = createFileRoute("/truyen/$slug")({
 });
 
 function StoryDetail() {
-  const { story } = Route.useLoaderData();
-  const others = stories.filter((s) => s.slug !== story.slug);
+  const { slug } = Route.useParams();
+  const { data: allStories } = useSuspenseQuery(storiesQueryOptions);
+  const story = allStories.find((s) => s.slug === slug)!;
+  const others = allStories.filter((s) => s.slug !== story.slug);
 
  const handleShare = () => {
   navigator.clipboard.writeText(window.location.href);
@@ -115,7 +117,7 @@ function StoryDetail() {
             <p className="reading-body mt-2 whitespace-pre-line text-muted-foreground">{story.summary}</p>
           </section>
 
-          <section className="pastel-panel mt-6 p-4 sm:p-6">
+          <section id="danh-sach-chuong" className="pastel-panel mt-6 scroll-mt-24 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-primary">Danh sách chương</h2>
             <ul className="mt-3 divide-y divide-border">
               {story.chapters.map((c) => (
