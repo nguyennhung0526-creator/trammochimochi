@@ -4,7 +4,7 @@ import { fetchStoriesFromSheets, stories as localStories, type Story } from "./s
 
 export const storiesQueryOptions = queryOptions({
   queryKey: ["stories"],
-  staleTime: 5 * 60_000,
+  staleTime: 30_000,
   queryFn: async (): Promise<Story[]> => {
     const remote = await fetchStoriesFromSheets();
     const bySlug = new Map<string, Story>();

@@ -1,9 +1,10 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { BookOpen, ChevronRight, Eye, Link2 } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { StatusPill } from "@/components/StoryCard";
-import { getStory, stories } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
 
 const slugify = (s: string) =>
   s
@@ -15,21 +16,19 @@ const slugify = (s: string) =>
     .replace(/\s+/g, "-");
 
 export const Route = createFileRoute("/truyen/$slug")({
-  loader: ({ params }) => {
-    const story = getStory(params.slug);
-    if (!story) throw notFound();
-    return { story };
-  },
-  head: ({ loaderData }) => {
-    const story = loaderData?.story;
-    const title = story ? `${story.title} — Trạm Mochi Mochi` : "Truyện — Trạm Mochi Mochi";
-    const desc = story?.summary ?? "Đọc truyện tại Trạm Mochi Mochi.";
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(storiesQueryOptions).then((stories) => {
+      if (!stories.some((s) => s.slug === params.slug)) throw notFound();
+    }),
+  head: () => {
+    const title = "Truyện — Trạm Mochi Mochi";
+    const desc = "Đọc truyện online tại Trạm Mochi Mochi.";
     return {
       meta: [
         { title },
-        { name: "description", content: desc.slice(0, 155) },
+        { name: "description", content: desc },
         { property: "og:title", content: title },
-        { property: "og:description", content: desc.slice(0, 155) },
+        { property: "og:description", content: desc },
       ],
     };
   },
@@ -37,8 +36,10 @@ export const Route = createFileRoute("/truyen/$slug")({
 });
 
 function StoryDetail() {
-  const { story } = Route.useLoaderData();
-  const others = stories.filter((s) => s.slug !== story.slug);
+  const { slug } = Route.useParams();
+  const { data: allStories } = useSuspenseQuery(storiesQueryOptions);
+  const story = allStories.find((s) => s.slug === slug)!;
+  const others = allStories.filter((s) => s.slug !== story.slug);
 
  const handleShare = () => {
   navigator.clipboard.writeText(window.location.href);
@@ -115,7 +116,7 @@ function StoryDetail() {
             <p className="reading-body mt-2 whitespace-pre-line text-muted-foreground">{story.summary}</p>
           </section>
 
-          <section className="pastel-panel mt-6 p-4 sm:p-6">
+          <section id="danh-sach-chuong" className="pastel-panel mt-6 scroll-mt-24 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-primary">Danh sách chương</h2>
             <ul className="mt-3 divide-y divide-border">
               {story.chapters.map((c) => (
