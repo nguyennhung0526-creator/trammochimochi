@@ -20,16 +20,15 @@ export const Route = createFileRoute("/truyen/$slug")({
     context.queryClient.ensureQueryData(storiesQueryOptions).then((stories) => {
       if (!stories.some((s) => s.slug === params.slug)) throw notFound();
     }),
-  head: ({ loaderData }) => {
-    const story = loaderData?.story;
-    const title = story ? `${story.title} — Trạm Mochi Mochi` : "Truyện — Trạm Mochi Mochi";
-    const desc = story?.summary ?? "Đọc truyện tại Trạm Mochi Mochi.";
+  head: () => {
+    const title = "Truyện — Trạm Mochi Mochi";
+    const desc = "Đọc truyện online tại Trạm Mochi Mochi.";
     return {
       meta: [
         { title },
-        { name: "description", content: desc.slice(0, 155) },
+        { name: "description", content: desc },
         { property: "og:title", content: title },
-        { property: "og:description", content: desc.slice(0, 155) },
+        { property: "og:description", content: desc },
       ],
     };
   },
