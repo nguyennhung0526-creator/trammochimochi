@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TaiKhoanRouteImport } from './routes/tai-khoan'
 import { Route as TimKiemRouteImport } from './routes/tim-kiem'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as DanhSachLoaiRouteImport } from './routes/danh-sach.$loai'
 import { Route as TheLoaiTenRouteImport } from './routes/the-loai.$ten'
 import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
@@ -20,6 +23,15 @@ import { Route as DocSlugSoRouteImport } from './routes/doc.$slug.$so'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TaiKhoanRoute = TaiKhoanRouteImport.update({
@@ -31,6 +43,11 @@ const TimKiemRoute = TimKiemRouteImport.update({
   id: '/tim-kiem',
   path: '/tim-kiem',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const DanhSachLoaiRoute = DanhSachLoaiRouteImport.update({
   id: '/danh-sach/$loai',
@@ -55,8 +72,10 @@ const DocSlugSoRoute = DocSlugSoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/tai-khoan': typeof TaiKhoanRoute
   '/tim-kiem': typeof TimKiemRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
   '/truyen/$slug': typeof TruyenSlugRoute
@@ -64,8 +83,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/tai-khoan': typeof TaiKhoanRoute
   '/tim-kiem': typeof TimKiemRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
   '/truyen/$slug': typeof TruyenSlugRoute
@@ -74,8 +95,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/tai-khoan': typeof TaiKhoanRoute
   '/tim-kiem': typeof TimKiemRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
   '/truyen/$slug': typeof TruyenSlugRoute
@@ -85,8 +109,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/tai-khoan'
     | '/tim-kiem'
+    | '/admin'
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
     | '/truyen/$slug'
@@ -94,8 +120,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/tai-khoan'
     | '/tim-kiem'
+    | '/admin'
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
     | '/truyen/$slug'
@@ -103,8 +131,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/tai-khoan'
     | '/tim-kiem'
+    | '/_authenticated/admin'
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
     | '/truyen/$slug'
@@ -113,6 +144,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   TaiKhoanRoute: typeof TaiKhoanRoute
   TimKiemRoute: typeof TimKiemRoute
   DanhSachLoaiRoute: typeof DanhSachLoaiRoute
@@ -130,6 +163,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tai-khoan': {
       id: '/tai-khoan'
       path: '/tai-khoan'
@@ -143,6 +190,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tim-kiem'
       preLoaderRoute: typeof TimKiemRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/danh-sach/$loai': {
       id: '/danh-sach/$loai'
@@ -175,8 +229,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   TaiKhoanRoute: TaiKhoanRoute,
   TimKiemRoute: TimKiemRoute,
   DanhSachLoaiRoute: DanhSachLoaiRoute,
