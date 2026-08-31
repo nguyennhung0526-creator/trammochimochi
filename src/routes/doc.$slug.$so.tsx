@@ -2,8 +2,6 @@ import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
-
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { storiesQueryOptions } from "@/lib/stories-query";
