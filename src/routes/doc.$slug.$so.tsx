@@ -93,6 +93,7 @@ function Reader() {
           <Link
             to="/truyen/$slug"
             params={{ slug: story.slug }}
+            hash="danh-sach-chuong"
             className="inline-flex items-center justify-center gap-1 rounded-full bg-accent px-4 py-2.5 text-sm font-bold text-accent-foreground"
           >
             <List className="h-4 w-4" /> Chương
