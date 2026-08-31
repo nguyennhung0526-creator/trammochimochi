@@ -38,21 +38,20 @@ export const Route = createFileRoute("/doc/$slug/$so")({
 });
 
 function Reader() {
-  const { story, chapter } = Route.useLoaderData();
+  const { slug, so } = Route.useLoaderData();
+  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
+  const story = stories.find((s) => s.slug === slug);
+  const chapter = story?.chapters.find((c) => String(c.index) === so);
+  if (!story || !chapter) throw notFound();
+
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
   const next = chapter.index < story.chapters.length ? chapter.index + 1 : null;
   const isGated = chapter.index === GATED_CHAPTER;
   const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
-    if (!isGated) return;
-    setUnlocked(localStorage.getItem(unlockKey(story.slug)) === "1");
-  }, [isGated, story.slug]);
-
-  const handleUnlock = () => {
-    localStorage.setItem(unlockKey(story.slug), "1");
-    setUnlocked(true);
-  };
+    setUnlocked(false);
+  }, [slug, so]);
 
   const locked = isGated && !unlocked;
 
