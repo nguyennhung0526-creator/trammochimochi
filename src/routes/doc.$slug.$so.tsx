@@ -16,7 +16,7 @@ export const Route = createFileRoute("/doc/$slug/$so")({
       const story = stories.find((s) => s.slug === params.slug);
       const chapter = story?.chapters.find((c) => String(c.index) === params.so);
       if (!story || !chapter) throw notFound();
-      return { slug: params.slug, so: params.so };
+      return { story, chapter };
     }),
   head: ({ loaderData }) => {
     const title = loaderData
