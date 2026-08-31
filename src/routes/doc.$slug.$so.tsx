@@ -65,7 +65,7 @@ function Reader() {
           </Link>
           <span> / {chapter.title}</span>
         </nav>
-        {locked ? (
+        {locked && story.shopeeUrl ? (
           <ShopeeGate onUnlock={() => setUnlocked(true)} url={story.shopeeUrl} />
         ) : (
           <article className="pastel-panel mt-4 p-5 sm:p-8">
