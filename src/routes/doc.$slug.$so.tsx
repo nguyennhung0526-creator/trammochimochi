@@ -2,20 +2,22 @@ import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
-import { getStory } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
 
 const GATED_CHAPTER = 2;
-const unlockKey = (slug: string) => `mochi-unlock:${slug}:${GATED_CHAPTER}`;
 
 export const Route = createFileRoute("/doc/$slug/$so")({
-  loader: ({ params }) => {
-    const story = getStory(params.slug);
-    const chapter = story?.chapters.find((c) => String(c.index) === params.so);
-    if (!story || !chapter) throw notFound();
-    return { story, chapter };
-  },
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(storiesQueryOptions).then((stories) => {
+      const story = stories.find((s) => s.slug === params.slug);
+      const chapter = story?.chapters.find((c) => String(c.index) === params.so);
+      if (!story || !chapter) throw notFound();
+      return { slug: params.slug, so: params.so };
+    }),
   head: ({ loaderData }) => {
     const title = loaderData
       ? `${loaderData.story.title} - ${loaderData.chapter.title} — Trạm Mochi Mochi`
