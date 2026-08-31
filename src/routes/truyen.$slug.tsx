@@ -1,9 +1,10 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { BookOpen, ChevronRight, Eye, Link2 } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { StatusPill } from "@/components/StoryCard";
-import { getStory, stories } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
 
 const slugify = (s: string) =>
   s
@@ -15,11 +16,10 @@ const slugify = (s: string) =>
     .replace(/\s+/g, "-");
 
 export const Route = createFileRoute("/truyen/$slug")({
-  loader: ({ params }) => {
-    const story = getStory(params.slug);
-    if (!story) throw notFound();
-    return { story };
-  },
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(storiesQueryOptions).then((stories) => {
+      if (!stories.some((s) => s.slug === params.slug)) throw notFound();
+    }),
   head: ({ loaderData }) => {
     const story = loaderData?.story;
     const title = story ? `${story.title} — Trạm Mochi Mochi` : "Truyện — Trạm Mochi Mochi";
