@@ -57,6 +57,10 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
       const shopeeUrl = row.c[6]?.v || "";
       const chapterIndex = Number(row.c[7]?.v || 1);
       const chapterContent = row.c[8]?.v || "";
+      const coverUrl = String(row.c[9]?.v || "").trim();
+      const viewsRaw = row.c[10]?.v;
+      const totalChaptersRaw = row.c[11]?.v;
+      const hotRaw = String(row.c[12]?.v ?? "").trim().toLowerCase();
 
       if (!storiesMap[slug]) {
         storiesMap[slug] = {
@@ -64,7 +68,7 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
           title,
           author,
           status,
-          views: 20418,
+          views: 0,
           cover: cover1,
           tags,
           summary,
@@ -73,6 +77,18 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
         };
       }
       if (shopeeUrl) storiesMap[slug].shopeeUrl = shopeeUrl;
+      if (coverUrl) storiesMap[slug].cover = coverUrl;
+      if (viewsRaw !== undefined && viewsRaw !== null && String(viewsRaw) !== "") {
+        const v = Number(String(viewsRaw).replace(/[^\d]/g, ""));
+        if (!Number.isNaN(v) && v > 0) storiesMap[slug].views = v;
+      }
+      if (totalChaptersRaw !== undefined && totalChaptersRaw !== null && String(totalChaptersRaw) !== "") {
+        const t = Number(String(totalChaptersRaw).replace(/[^\d]/g, ""));
+        if (!Number.isNaN(t) && t > 0) storiesMap[slug].totalChapters = t;
+      }
+      if (hotRaw) {
+        storiesMap[slug].hot = ["true", "1", "x", "yes", "co", "có"].includes(hotRaw);
+      }
 
       const paragraphs = String(chapterContent)
         .split("\n")
