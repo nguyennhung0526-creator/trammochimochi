@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { StoryListPage } from "@/components/StoryList";
-import { stories } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
 
 const config: Record<string, { title: string; description: string }> = {
   "hoan-thanh": {
@@ -19,6 +20,7 @@ const config: Record<string, { title: string; description: string }> = {
 };
 
 export const Route = createFileRoute("/danh-sach/$loai")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(storiesQueryOptions),
   head: ({ params }) => {
     const c = config[params.loai] ?? { title: "Danh sách truyện", description: "" };
     return {
@@ -35,6 +37,7 @@ export const Route = createFileRoute("/danh-sach/$loai")({
 
 function ListRoute() {
   const { loai } = Route.useParams();
+  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
   const c = config[loai] ?? {
     title: "Danh sách truyện",
     description: "Tổng hợp truyện tại Trạm Mochi Mochi.",
@@ -45,7 +48,7 @@ function ListRoute() {
       : loai === "cho-full"
         ? stories.filter((s) => s.status !== "Hoàn Thành")
         : loai === "hot"
-          ? stories.filter((s) => s.hot)
+          ? [...stories].filter((s) => s.hot || s.views > 0).sort((a, b) => b.views - a.views)
           : stories;
 
   return <StoryListPage title={c.title} description={c.description} stories={items} />;
