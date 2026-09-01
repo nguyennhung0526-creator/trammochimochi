@@ -56,12 +56,11 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
       const tags = row.c[4]?.v ? String(row.c[4].v).split(",").map(t => t.trim()) : ["Ngôn Tình", "Hiện Đại"];
       const summary = row.c[5]?.v || "";
       const shopeeUrl = row.c[6]?.v || "";
-      const chapterIndex = Number(row.c[7]?.v || 1);
-      const chapterContent = row.c[8]?.v || "";
-      const coverUrl = String(row.c[9]?.v || "").trim();
-      const viewsRaw = row.c[10]?.v;
-      const totalChaptersRaw = row.c[11]?.v;
-      const hotRaw = String(row.c[12]?.v ?? "").trim().toLowerCase();
+      const totalChaptersRaw = row.c[7]?.v;
+      const chapterIndex = Number(row.c[8]?.v || 1);
+      const chapterContent = row.c[9]?.v || "";
+      const coverUrl = String(row.c[10]?.v || "").trim();
+      const viewsRaw = row.c[11]?.v;
 
       if (!storiesMap[slug]) {
         storiesMap[slug] = {
@@ -86,9 +85,6 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
       if (totalChaptersRaw !== undefined && totalChaptersRaw !== null && String(totalChaptersRaw) !== "") {
         const t = Number(String(totalChaptersRaw).replace(/[^\d]/g, ""));
         if (!Number.isNaN(t) && t > 0) storiesMap[slug].totalChapters = t;
-      }
-      if (hotRaw) {
-        storiesMap[slug].hot = ["true", "1", "x", "yes", "co", "có"].includes(hotRaw);
       }
 
       const paragraphs = String(chapterContent)
