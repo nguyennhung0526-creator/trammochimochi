@@ -1,14 +1,7 @@
 import type { LinkProps } from "@tanstack/react-router";
 
 import cover1 from "@/assets/cover-1.jpg";
-import cover2 from "@/assets/cover-2.jpg";
-import cover3 from "@/assets/cover-3.jpg";
-import cover4 from "@/assets/cover-4.jpg";
-
 import { mayTanTroiLaiSang } from "./story-may-tan";
-
-// Link Google Sheets Kho truyện Mochi của bạn
-const GOOGLE_SHEETS_LINK = "https://docs.google.com/spreadsheets/d/1Z6b0hFDR0NgzDA-rPg9LibyK9xzEm_uclp27DI322j4/edit?usp=sharing";
 
 export type Chapter = {
   index: number;
@@ -50,10 +43,11 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
       const slug = row.c[0]?.v || "";
       if (!slug) return;
 
-      const title = row.c[1]?.v || "Mây Tan Trời Lại Sáng";
+      // SỬA TẠI ĐÂY: Bỏ fallback cứng "Mây Tan Trời Lại Sáng" để tránh bị đè tên truyện khác
+      const title = row.c[1]?.v || slug; 
       const author = row.c[2]?.v || "";
       const status = (row.c[3]?.v || "Hoàn Thành") as Story["status"];
-      const tags = row.c[4]?.v ? String(row.c[4].v).split(",").map(t => t.trim()) : ["Ngôn Tình", "Hiện Đại"];
+      const tags = row.c[4]?.v ? String(row.c[4].v).split(",").map(t => t.trim()) : ["Ngôn Tình"];
       const summary = row.c[5]?.v || "";
       const shopeeUrl = row.c[6]?.v || "";
       const totalChaptersRaw = row.c[7]?.v;
@@ -69,19 +63,22 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
           author,
           status,
           views: 0,
-          cover: cover1,
+          cover: coverUrl || cover1,
           tags,
           summary,
           shopeeUrl,
           chapters: []
         };
       }
+
       if (shopeeUrl) storiesMap[slug].shopeeUrl = shopeeUrl;
       if (coverUrl) storiesMap[slug].cover = coverUrl;
+      
       if (viewsRaw !== undefined && viewsRaw !== null && String(viewsRaw) !== "") {
         const v = Number(String(viewsRaw).replace(/[^\d]/g, ""));
         if (!Number.isNaN(v) && v > 0) storiesMap[slug].views = v;
       }
+      
       if (totalChaptersRaw !== undefined && totalChaptersRaw !== null && String(totalChaptersRaw) !== "") {
         const t = Number(String(totalChaptersRaw).replace(/[^\d]/g, ""));
         if (!Number.isNaN(t) && t > 0) storiesMap[slug].totalChapters = t;
@@ -104,7 +101,8 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
       }
     });
 
-    return Object.values(storiesMap);
+    const result = Object.values(storiesMap);
+    return result.length > 0 ? result : stories;
   } catch (error) {
     console.error("Lỗi tải Google Sheets:", error);
     return stories;
@@ -112,8 +110,6 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
 }
 
 export const stories: Story[] = [mayTanTroiLaiSang];
-
-export const getStory = (slug: string) => stories.find((s) => s.slug === slug);
 
 export const navItems: { label: string; link: LinkProps }[] = [
   { label: "Trang chủ", link: { to: "/" } },
