@@ -41,6 +41,8 @@ export const Route = createFileRoute("/doc/$slug/$so")({
 
 function Reader() {
   const { story, chapter } = Route.useLoaderData();
+  const trackView = useServerFn(trackStoryView);
+  const queryClient = useQueryClient();
 
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
   const next = chapter.index < story.chapters.length ? chapter.index + 1 : null;
@@ -51,7 +53,18 @@ function Reader() {
     setUnlocked(false);
   }, [story.slug, chapter.index]);
 
+  // Ghi lượt xem thật vào Google Sheets, mỗi truyện tính 1 lượt cho mỗi phiên đọc
+  useEffect(() => {
+    const key = `mochi-viewed:${story.slug}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    trackView({ data: { slug: story.slug } })
+      .then(() => queryClient.invalidateQueries({ queryKey: ["stories"] }))
+      .catch((e) => console.error("Không ghi được lượt xem:", e));
+  }, [story.slug, trackView, queryClient]);
+
   const locked = isGated && !unlocked;
+
 
   return (
     <div className="min-h-screen">
