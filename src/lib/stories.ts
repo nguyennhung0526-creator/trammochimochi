@@ -29,6 +29,7 @@ export type Story = {
   chapters: Chapter[];
   hot?: boolean;
   shopeeUrl?: string;
+  totalChapters?: number;
 };
 
 export async function fetchStoriesFromSheets(): Promise<Story[]> {
