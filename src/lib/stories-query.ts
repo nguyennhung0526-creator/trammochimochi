@@ -15,8 +15,9 @@ function dbToStory(row: DbStory): Story {
   return {
     slug: row.slug,
     title: row.title,
-    author: row.author ?? undefined,
-    translator: row.translator ?? undefined,
+    ...(row.author ? { author: row.author } : {}),
+    ...(row.translator ? { translator: row.translator } : {}),
+    ...(row.shopee_url ? { shopeeUrl: row.shopee_url } : {}),
     status: (row.status as Story["status"]) ?? "Hoàn Thành",
     views: row.views ?? 0,
     cover: row.cover_url || cover1,
