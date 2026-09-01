@@ -4,26 +4,38 @@ import { z } from "zod";
 import { StoryListPage } from "@/components/StoryList";
 import { stories } from "@/lib/stories";
 
-// Hàm chuẩn hóa chuỗi: Giải mã URL, đổi dấu '+' thành khoảng trắng, loại bỏ dấu tiếng Việt và chuyển chữ thường
+// Hàm chuẩn hóa chuỗi tiếng Việt & URL chuẩn xác
 function normalizeText(str: string) {
   if (!str) return "";
-  const decoded = decodeURIComponent(str.replace(/\+/g, " "));
-  return decoded
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim();
+  try {
+    // 1. Decode URL trước (ví dụ: l%C3%A3ng -> lãng)
+    let decoded = decodeURIComponent(str);
+    // 2. Chuyển dấu '+' thành khoảng trắng
+    decoded = decoded.replace(/\+/g, " ");
+    // 3. Xóa dấu tiếng Việt & chuyển chữ thường
+    return decoded
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase()
+      .trim();
+  } catch (e) {
+    // Dự phòng nếu chuỗi không cần decode
+    return str
+      .replace(/\+/g, " ")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase()
+      .trim();
+  }
 }
 
 export const Route = createFileRoute("/tim-kiem")({
   validateSearch: z.object({
-    q: z
-      .string()
-      .optional()
-      .default("")
-      .transform((val) => val.replace(/\+/g, " ").trim()), // Tự động đổi '+' thành khoảng trắng ngay trong Schema
+    q: z.string().optional().default(""),
   }),
   head: () => ({
     meta: [
@@ -39,24 +51,31 @@ export const Route = createFileRoute("/tim-kiem")({
 function SearchRoute() {
   const { q } = Route.useSearch();
   
-  // Chuẩn hóa từ khóa người dùng nhập và tách thành các từ đơn
+  // Chuẩn hóa từ khóa tìm kiếm
   const normalizedQuery = normalizeText(q);
   const searchWords = normalizedQuery.split(/\s+/).filter(Boolean);
 
   const items = searchWords.length
     ? stories.filter((s) => {
-        // Gộp tất cả thông tin tìm kiếm và chuẩn hóa
-        const fullContent = normalizeText(
-          [s.title, s.author, ...(s.tags || [])].join(" ")
-        );
+        // Lấy tất cả thông tin truyện & chuẩn hóa
+        const title = normalizeText(s.title || "");
+        const author = normalizeText(s.author || "");
+        const tags = (s.tags || []).map((t: string) => normalizeText(t)).join(" ");
+        
+        const fullContent = `${title} ${author} ${tags}`;
 
-        // Kiểm tra nếu thông tin chứa TẤT CẢ các từ người dùng gõ
+        // So sánh: Chỉ cần thông tin truyện chứa các từ trong từ khóa
         return searchWords.every((word) => fullContent.includes(word));
       })
     : stories;
 
-  // Hiển thị từ khóa đã xóa dấu '+' trên giao diện
-  const displayQuery = q.replace(/\+/g, " ").trim();
+  // Lấy chuỗi hiển thị lại trên giao diện người dùng
+  let displayQuery = q;
+  try {
+    displayQuery = decodeURIComponent(q).replace(/\+/g, " ").trim();
+  } catch (e) {
+    displayQuery = q.replace(/\+/g, " ").trim();
+  }
 
   return (
     <StoryListPage
