@@ -63,8 +63,12 @@ function StoryDetail() {
               <h1 className="text-xl font-bold uppercase md:text-2xl">{story.title}</h1>
               <dl className="mt-4 grid gap-2 text-sm">
                 <Row label="Tác Giả" value={<span className="text-primary">{story.author}</span>} />
-                <Row label="Chuyển ngữ" value={story.translator} />
                 <Row label="Tình trạng" value={<StatusPill status={story.status} />} />
+                <Row label="Lượt xem" value={story.views.toLocaleString("vi-VN")} />
+                <Row
+                  label="Số chương"
+                  value={String(story.totalChapters ?? story.chapters.length)}
+                />
                 <Row label="Chương mới nhất" value={String(story.chapters.length)} />
               </dl>
 

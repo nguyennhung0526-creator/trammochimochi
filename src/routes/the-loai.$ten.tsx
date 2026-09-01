@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { StoryListPage } from "@/components/StoryList";
-import { stories } from "@/lib/stories";
+import { storiesQueryOptions } from "@/lib/stories-query";
 
 const slugify = (s: string) =>
   s
@@ -13,6 +14,7 @@ const slugify = (s: string) =>
     .replace(/\s+/g, "-");
 
 export const Route = createFileRoute("/the-loai/$ten")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(storiesQueryOptions),
   head: ({ params }) => ({
     meta: [
       { title: `Thể loại ${params.ten} — Trạm Mochi Mochi` },
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/the-loai/$ten")({
 
 function GenreRoute() {
   const { ten } = Route.useParams();
+  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
   const items = stories.filter((s) => s.tags.some((t) => slugify(t) === ten));
   const label = items[0]?.tags.find((t) => slugify(t) === ten) ?? ten;
 

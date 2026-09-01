@@ -7,9 +7,7 @@ export function StatusPill({ status }: { status: Story["status"] }) {
   const tone =
     status === "Hoàn Thành"
       ? "bg-success text-success-foreground"
-      : status === "Đang ra"
-        ? "bg-accent text-accent-foreground"
-        : "bg-butter text-butter-foreground";
+      : "bg-butter text-butter-foreground";
   return (
     <span className={`rounded-full px-3 py-1 text-xs font-bold ${tone}`}>{status}</span>
   );

@@ -37,8 +37,9 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data: stories } = useSuspenseQuery(storiesQueryOptions);
-  const hot = stories.filter((s) => s.hot);
-  const featured = stories[0];
+  const byViews = [...stories].sort((a, b) => b.views - a.views);
+  const hot = byViews.filter((s) => s.hot || s.views > 0);
+  const featured = byViews[0];
 
   if (!featured) {
     return (
