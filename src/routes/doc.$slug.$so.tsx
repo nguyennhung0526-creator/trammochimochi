@@ -1,12 +1,16 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { storiesQueryOptions } from "@/lib/stories-query";
+import { trackStoryView } from "@/lib/views.functions";
 
 const GATED_CHAPTER = 2;
+
 
 export const Route = createFileRoute("/doc/$slug/$so")({
   loader: ({ context, params }) =>
