@@ -2,17 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { StoryListPage } from "@/components/StoryList";
+import { StoryCard } from "@/components/StoryCard"; // Giữ component hiển thị thẻ truyện của bạn
 import { stories } from "@/lib/stories";
 
-// Hàm chuẩn hóa chuỗi tiếng Việt & URL chuẩn xác
+// Hàm chuẩn hóa tiếng Việt & decode URL chuẩn xác
 function normalizeText(str: string) {
   if (!str) return "";
   try {
-    // 1. Decode URL trước (ví dụ: l%C3%A3ng -> lãng)
-    let decoded = decodeURIComponent(str);
-    // 2. Chuyển dấu '+' thành khoảng trắng
-    decoded = decoded.replace(/\+/g, " ");
-    // 3. Xóa dấu tiếng Việt & chuyển chữ thường
+    let decoded = decodeURIComponent(str).replace(/\+/g, " ");
     return decoded
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -21,7 +18,6 @@ function normalizeText(str: string) {
       .toLowerCase()
       .trim();
   } catch (e) {
-    // Dự phòng nếu chuỗi không cần decode
     return str
       .replace(/\+/g, " ")
       .normalize("NFD")
@@ -41,8 +37,6 @@ export const Route = createFileRoute("/tim-kiem")({
     meta: [
       { title: "Tìm kiếm truyện — Trạm Mochi Mochi" },
       { name: "description", content: "Tìm truyện theo tên, tác giả hoặc thể loại tại Trạm Mochi Mochi." },
-      { property: "og:title", content: "Tìm kiếm truyện — Trạm Mochi Mochi" },
-      { property: "og:description", content: "Tìm truyện theo tên, tác giả hoặc thể loại." },
     ],
   }),
   component: SearchRoute,
@@ -51,25 +45,27 @@ export const Route = createFileRoute("/tim-kiem")({
 function SearchRoute() {
   const { q } = Route.useSearch();
   
-  // Chuẩn hóa từ khóa tìm kiếm
+  // 1. Chuẩn hóa từ khóa nhập vào
   const normalizedQuery = normalizeText(q);
   const searchWords = normalizedQuery.split(/\s+/).filter(Boolean);
 
-  const items = searchWords.length
+  // 2. Lọc danh sách truyện theo từ khóa
+  const searchResults = searchWords.length
     ? stories.filter((s) => {
-        // Lấy tất cả thông tin truyện & chuẩn hóa
         const title = normalizeText(s.title || "");
         const author = normalizeText(s.author || "");
         const tags = (s.tags || []).map((t: string) => normalizeText(t)).join(" ");
-        
         const fullContent = `${title} ${author} ${tags}`;
 
-        // So sánh: Chỉ cần thông tin truyện chứa các từ trong từ khóa
+        // Chỉ cần chứa tất cả các từ đơn trong từ khóa
         return searchWords.every((word) => fullContent.includes(word));
       })
-    : stories;
+    : [];
 
-  // Lấy chuỗi hiển thị lại trên giao diện người dùng
+  // 3. Lấy danh sách 4-8 truyện mới nhất/gần đây (Dựa theo thứ tự trong Google Sheets hoặc thuộc tính id/createdAt)
+  const recentStories = [...stories].reverse().slice(0, 8);
+
+  // Lấy từ khóa sạch để hiển thị trên tiêu đề
   let displayQuery = q;
   try {
     displayQuery = decodeURIComponent(q).replace(/\+/g, " ").trim();
@@ -77,11 +73,45 @@ function SearchRoute() {
     displayQuery = q.replace(/\+/g, " ").trim();
   }
 
+  // Trường hợp 1: Đã nhập từ khóa và tìm thấy kết quả
+  if (displayQuery && searchResults.length > 0) {
+    return (
+      <StoryListPage
+        title={`Kết quả cho “${displayQuery}”`}
+        description={`Tìm thấy ${searchResults.length} bộ truyện.`}
+        stories={searchResults}
+      />
+    );
+  }
+
+  // Trường hợp 2: Không nhập gì HOẶC Không tìm thấy kết quả -> Hiển thị thông báo + Gợi ý truyện mới nhất
   return (
-    <StoryListPage
-      title={displayQuery ? `Kết quả cho “${displayQuery}”` : "Tất cả truyện"}
-      description={`Tìm thấy ${items.length} bộ truyện.`}
-      stories={items}
-    />
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-800">
+          {displayQuery ? `Không tìm thấy kết quả cho “${displayQuery}”` : "Tìm kiếm truyện"}
+        </h1>
+        <p className="mt-2 text-sm text-gray-500">
+          {displayQuery
+            ? "Bạn thử tìm bằng tên khác hoặc khám phá các bộ truyện mới cập nhật bên dưới nhé!"
+            : "Nhập tên truyện, tác giả hoặc thể loại vào ô tìm kiếm ở trên."}
+        </p>
+      </div>
+
+      {/* Phần hiển thị danh sách truyện mới cập nhật gần đây */}
+      <div className="mt-10">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold text-pink-600 flex items-center gap-2">
+            ✨ Truyện mới cập nhật gần đây
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {recentStories.map((story) => (
+            <StoryCard key={story.slug || story.id} story={story} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
