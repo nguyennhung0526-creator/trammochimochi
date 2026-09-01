@@ -24,7 +24,6 @@ function dbToStory(row: DbStory): Story {
     tags: row.tags?.length ? row.tags : ["Ngôn Tình"],
     summary: row.summary ?? "",
     hot: row.hot,
-    shopeeUrl: row.shopee_url ?? undefined,
     chapters: (row.chapters ?? []).map((c) => ({
       index: c.chapter_index,
       title: c.title || `Chương ${c.chapter_index}`,
