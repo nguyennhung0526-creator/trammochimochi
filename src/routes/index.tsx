@@ -97,25 +97,41 @@ function Home() {
           />
         </section>
 
-        <Section title="Mới cập nhật" items={stories} />
-        <Section title="Truyện hot" items={hot} />
-      </main>
-      <SiteFooter />
-    </div>
-  );
+        <Section title="Mới cập nhật" items={latest} moreLoai="hoan-thanh" />
+        <Section title="Truyện hot" items={hot} moreLoai="hot" />
+      </main>
+      <SiteFooter />
+    </div>
+  );
 }
 
-function Section({ title, items }: { title: string; items: Story[] }) {
-  return (
-    <section className="mt-10">
-      <h2 className="border-b-2 border-primary/40 pb-2 text-lg font-bold text-primary md:text-xl">
-        {title}
-      </h2>
-      <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {items.map((s) => (
-          <StoryCard key={s.slug} story={s} />
-        ))}
-      </div>
-    </section>
-  );
+function Section({
+  title,
+  items,
+  moreLoai,
+}: {
+  title: string;
+  items: Story[];
+  moreLoai: "hot" | "hoan-thanh" | "cho-full";
+}) {
+  return (
+    <section className="mt-10">
+      <div className="flex items-end justify-between gap-3 border-b-2 border-primary/40 pb-2">
+        <h2 className="text-lg font-bold text-primary md:text-xl">{title}</h2>
+        <Link
+          to="/danh-sach/$loai"
+          params={{ loai: moreLoai }}
+          className="text-xs font-semibold text-primary hover:underline"
+        >
+          Xem tất cả →
+        </Link>
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {items.map((s) => (
+          <StoryCard key={s.slug} story={s} />
+        ))}
+      </div>
+    </section>
+  );
+
 } 
