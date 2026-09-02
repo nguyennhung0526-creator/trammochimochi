@@ -17,13 +17,13 @@ export function GenreSidebar({ activeSlug }: { activeSlug?: string }) {
         <Tags className="h-4 w-4" /> Thể loại
       </h2>
 
-      <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:grid lg:grid-cols-2 lg:gap-1.5 lg:overflow-visible lg:pb-0">
+      <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-visible lg:pb-0">
         {genres.map((g) => (
-          <li key={g.slug} className="shrink-0">
+          <li key={g.slug} className="shrink-0 lg:min-w-0">
             <Link
               to="/the-loai/$ten"
               params={{ ten: g.slug }}
-              className={`block rounded-full px-3 py-1.5 text-center text-xs font-semibold whitespace-nowrap transition-colors lg:text-left ${
+              className={`block rounded-full px-3 py-1.5 text-center text-xs font-semibold whitespace-nowrap transition-colors lg:text-left lg:whitespace-normal lg:break-words ${
                 g.slug === activeSlug
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary/70 text-secondary-foreground hover:bg-secondary"
