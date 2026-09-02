@@ -48,8 +48,7 @@ function ListRoute() {
       : loai === "cho-full"
         ? stories.filter((s) => s.status !== "Hoàn Thành")
         : loai === "hot"
-          ? [...stories].sort((a, b) => b.views - a.views)
-
+          ? [...stories].sort((a, b) => b.views - a.views).slice(0, 3)
           : stories;
 
   return <StoryListPage title={c.title} description={c.description} stories={items} />;
