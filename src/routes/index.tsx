@@ -36,10 +36,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
+  const { data: stories } = useSuspenseQuery(storiesQueryOptions);
   const byViews = [...stories].sort((a, b) => b.views - a.views);
-  const hot = byViews.filter((s) => s.hot || s.views > 0);
+  const hot = byViews.slice(0, 3);
+  const latest = [...stories].reverse().slice(0, 3);
   const featured = byViews[0];
+
 
   if (!featured) {
     return (
