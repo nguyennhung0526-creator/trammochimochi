@@ -117,4 +117,6 @@ export const navItems: { label: string; link: LinkProps }[] = [
   { label: "Truyện hoàn thành", link: { to: "/danh-sach/$loai", params: { loai: "hoan-thanh" } } },
   { label: "Truyện chờ full", link: { to: "/danh-sach/$loai", params: { loai: "cho-full" } } },
   { label: "Truyện hot", link: { to: "/danh-sach/$loai", params: { loai: "hot" } } },
+  { label: "Thể loại", link: { to: "/the-loai" } },
 ];
+
