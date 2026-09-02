@@ -16,6 +16,7 @@ import { Route as TaiKhoanRouteImport } from './routes/tai-khoan'
 import { Route as TimKiemRouteImport } from './routes/tim-kiem'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as DanhSachLoaiRouteImport } from './routes/danh-sach.$loai'
+import { Route as TheLoaiIndexRouteImport } from './routes/the-loai.index'
 import { Route as TheLoaiTenRouteImport } from './routes/the-loai.$ten'
 import { Route as TruyenSlugRouteImport } from './routes/truyen.$slug'
 import { Route as DocSlugSoRouteImport } from './routes/doc.$slug.$so'
@@ -54,6 +55,11 @@ const DanhSachLoaiRoute = DanhSachLoaiRouteImport.update({
   path: '/danh-sach/$loai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TheLoaiIndexRoute = TheLoaiIndexRouteImport.update({
+  id: '/the-loai/',
+  path: '/the-loai/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TheLoaiTenRoute = TheLoaiTenRouteImport.update({
   id: '/the-loai/$ten',
   path: '/the-loai/$ten',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
   '/truyen/$slug': typeof TruyenSlugRoute
+  '/the-loai/': typeof TheLoaiIndexRoute
   '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRoutesByTo {
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
   '/truyen/$slug': typeof TruyenSlugRoute
+  '/the-loai': typeof TheLoaiIndexRoute
   '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRoutesById {
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/danh-sach/$loai': typeof DanhSachLoaiRoute
   '/the-loai/$ten': typeof TheLoaiTenRoute
   '/truyen/$slug': typeof TruyenSlugRoute
+  '/the-loai/': typeof TheLoaiIndexRoute
   '/doc/$slug/$so': typeof DocSlugSoRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
     | '/truyen/$slug'
+    | '/the-loai/'
     | '/doc/$slug/$so'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
     | '/truyen/$slug'
+    | '/the-loai'
     | '/doc/$slug/$so'
   id:
     | '__root__'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/danh-sach/$loai'
     | '/the-loai/$ten'
     | '/truyen/$slug'
+    | '/the-loai/'
     | '/doc/$slug/$so'
   fileRoutesById: FileRoutesById
 }
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   DanhSachLoaiRoute: typeof DanhSachLoaiRoute
   TheLoaiTenRoute: typeof TheLoaiTenRoute
   TruyenSlugRoute: typeof TruyenSlugRoute
+  TheLoaiIndexRoute: typeof TheLoaiIndexRoute
   DocSlugSoRoute: typeof DocSlugSoRoute
 }
 
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DanhSachLoaiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/the-loai/': {
+      id: '/the-loai/'
+      path: '/the-loai'
+      fullPath: '/the-loai/'
+      preLoaderRoute: typeof TheLoaiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/the-loai/$ten': {
       id: '/the-loai/$ten'
       path: '/the-loai/$ten'
@@ -249,6 +269,7 @@ const rootRouteChildren: RootRouteChildren = {
   DanhSachLoaiRoute: DanhSachLoaiRoute,
   TheLoaiTenRoute: TheLoaiTenRoute,
   TruyenSlugRoute: TruyenSlugRoute,
+  TheLoaiIndexRoute: TheLoaiIndexRoute,
   DocSlugSoRoute: DocSlugSoRoute,
 }
 export const routeTree = rootRouteImport
