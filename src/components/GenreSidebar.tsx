@@ -19,7 +19,7 @@ export function GenreSidebar({ activeSlug }: { activeSlug?: string }) {
 
       <ul className="mt-3 flex w-full min-w-0 max-w-full flex-wrap gap-2 pb-1 lg:grid lg:grid-cols-2 lg:gap-2 lg:pb-0">
         {genres.map((g) => (
-          <li key={g.slug} className="shrink-0 lg:min-w-0">
+          <li key={g.slug} className="min-w-0 max-w-full">
             <Link
               to="/the-loai/$ten"
               params={{ ten: g.slug }}
