@@ -40,21 +40,22 @@ export async function fetchStoriesFromSheets(): Promise<Story[]> {
     const storiesMap: { [key: string]: Story } = {};
 
     rows.forEach((row: any) => {
-      const slug = row.c[0]?.v || "";
+      // Cột A = số thứ tự (stt) — chỉ dùng trong Sheets, không hiển thị trên web
+      const slug = row.c[1]?.v || "";
       if (!slug) return;
 
       // SỬA TẠI ĐÂY: Bỏ fallback cứng "Mây Tan Trời Lại Sáng" để tránh bị đè tên truyện khác
-      const title = row.c[1]?.v || slug; 
-      const author = row.c[2]?.v || "";
-      const status = (row.c[3]?.v || "Hoàn Thành") as Story["status"];
-      const tags = row.c[4]?.v ? String(row.c[4].v).split(",").map(t => t.trim()) : ["Ngôn Tình"];
-      const summary = row.c[5]?.v || "";
-      const shopeeUrl = row.c[6]?.v || "";
-      const totalChaptersRaw = row.c[7]?.v;
-      const chapterIndex = Number(row.c[8]?.v || 1);
-      const chapterContent = row.c[9]?.v || "";
-      const coverUrl = String(row.c[10]?.v || "").trim();
-      const viewsRaw = row.c[11]?.v;
+      const title = row.c[2]?.v || slug; 
+      const author = row.c[3]?.v || "";
+      const status = (row.c[4]?.v || "Hoàn Thành") as Story["status"];
+      const tags = row.c[5]?.v ? String(row.c[5].v).split(",").map(t => t.trim()) : ["Ngôn Tình"];
+      const summary = row.c[6]?.v || "";
+      const shopeeUrl = row.c[7]?.v || "";
+      const totalChaptersRaw = row.c[8]?.v;
+      const chapterIndex = Number(row.c[9]?.v || 1);
+      const chapterContent = row.c[10]?.v || "";
+      const coverUrl = String(row.c[11]?.v || "").trim();
+      const viewsRaw = row.c[12]?.v;
 
       if (!storiesMap[slug]) {
         storiesMap[slug] = {
