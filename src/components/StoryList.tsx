@@ -21,7 +21,7 @@ export function StoryListPage({
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto grid max-w-6xl gap-6 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_260px]">
+      <main className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 overflow-x-hidden px-4 py-8 lg:grid-cols-[minmax(0,1fr)_260px]">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-primary md:text-3xl">{title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{description}</p>
