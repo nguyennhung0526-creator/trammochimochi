@@ -23,7 +23,7 @@ export function GenreSidebar({ activeSlug }: { activeSlug?: string }) {
             <Link
               to="/the-loai/$ten"
               params={{ ten: g.slug }}
-              className={`block rounded-full px-3 py-1.5 text-center text-xs font-semibold whitespace-nowrap transition-colors lg:text-left lg:whitespace-normal lg:break-words ${
+              className={`block max-w-full rounded-full px-3 py-1.5 text-center text-xs font-semibold break-words transition-colors lg:text-left ${
                 g.slug === activeSlug
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary/70 text-secondary-foreground hover:bg-secondary"
