@@ -9,7 +9,9 @@ export function StatusPill({ status }: { status: Story["status"] }) {
       ? "bg-success text-success-foreground"
       : "bg-butter text-butter-foreground";
   return (
-    <span className={`rounded-full px-3 py-1 text-xs font-bold ${tone}`}>{status}</span>
+    <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap ${tone}`}>
+      {status}
+    </span>
   );
 }
 
