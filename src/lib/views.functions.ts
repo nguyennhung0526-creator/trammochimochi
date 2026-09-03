@@ -26,21 +26,21 @@ async function callSheets(path: string, init?: RequestInit) {
   return res.json();
 }
 
-/** Tăng lượt xem thật của truyện (cột L) trong Google Sheets, trả về tổng lượt xem mới. */
+/** Tăng lượt xem thật của truyện (cột M) trong Google Sheets, trả về tổng lượt xem mới. */
 export const trackStoryView = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ slug: z.string().min(1).max(200) }).parse(data))
   .handler(async ({ data }): Promise<{ views: number }> => {
-    const range = `${SHEET_NAME}!A2:L1000`;
+    const range = `${SHEET_NAME}!B2:M1000`;
     const sheet = await callSheets(`/spreadsheets/${SHEET_ID}/values/${range}`);
     const rows: string[][] = sheet.values ?? [];
 
-    // Dòng đầu tiên của truyện là dòng giữ lượt xem
+    // Dòng đầu tiên của truyện là dòng giữ lượt xem (cột B = slug, cột M = views)
     const rowOffset = rows.findIndex((r) => (r?.[0] ?? "").trim() === data.slug);
     if (rowOffset === -1) throw new Error(`Không tìm thấy truyện "${data.slug}" trong Google Sheets`);
 
     const current = Number(String(rows[rowOffset]?.[11] ?? "").replace(/[^\d]/g, "")) || 0;
     const views = current + 1;
-    const cell = `${SHEET_NAME}!L${rowOffset + 2}`;
+    const cell = `${SHEET_NAME}!M${rowOffset + 2}`;
 
     await callSheets(`/spreadsheets/${SHEET_ID}/values/${cell}?valueInputOption=RAW`, {
       method: "PUT",
