@@ -109,7 +109,7 @@ export function ShopeeGate({ onUnlock, url }: { onUnlock: () => void; url: strin
           }
           onUnlock();
         }}
-        className="mx-auto mt-5 block w-full max-w-sm overflow-hidden rounded-2xl border border-border transition hover:opacity-90"
+        className="mx-auto mt-5 block w-full max-w-sm overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/15 via-lilac/15 to-butter/15 p-2 shadow-card transition hover:opacity-90"
       >
         <img
           src={shopeeClick.url}
