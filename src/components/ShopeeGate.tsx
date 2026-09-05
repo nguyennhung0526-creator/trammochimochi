@@ -60,12 +60,10 @@ export function ShopeeGate({ onUnlock, url }: { onUnlock: () => void; url: strin
       <p className="text-base font-semibold">Cảm ơn Quý độc giả đã ủng hộ!</p>
       <p className="mt-3 text-sm sm:text-base">
         Tiếp tục ủng hộ <strong>Trạm Mochi Mochi</strong> bằng cách <strong>CLICK</strong> vào{" "}
-        <strong>LIÊN KẾT HOẶC ẢNH</strong> bên dưới
+        <strong>LIÊN KẾT HOẶC ẢNH</strong> bên dưới, sau đó quay trở lại để tiếp tục đọc toàn bộ
+        chương truyện!
       </p>
-      <p className="mt-3 text-sm sm:text-base">
-        <span className="font-bold text-destructive">MỞ BẰNG TRÌNH DUYỆT (Chrome/Safari)</span>, sau
-        đó quay trở lại để tiếp tục đọc toàn bộ chương truyện!
-      </p>
+
 
       {inApp && (
         <div className="mt-4 rounded-2xl border border-border bg-secondary p-4 text-left text-sm text-secondary-foreground">
