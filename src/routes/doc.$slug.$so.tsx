@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { storiesQueryOptions } from "@/lib/stories-query";
-import { trackStoryView } from "@/lib/views.functions";
+import { trackShopeeClick, trackStoryView } from "@/lib/views.functions";
 
 const GATED_CHAPTER = 2;
 
@@ -42,6 +42,7 @@ export const Route = createFileRoute("/doc/$slug/$so")({
 function Reader() {
   const { story, chapter } = Route.useLoaderData();
   const trackView = useServerFn(trackStoryView);
+  const trackClick = useServerFn(trackShopeeClick);
   const queryClient = useQueryClient();
 
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
