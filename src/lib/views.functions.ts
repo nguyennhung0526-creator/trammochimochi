@@ -26,26 +26,63 @@ async function callSheets(path: string, init?: RequestInit) {
   return res.json();
 }
 
-/** Tăng lượt xem thật của truyện (cột M) trong Google Sheets, trả về tổng lượt xem mới. */
+function toNumber(value: unknown) {
+  return Number(String(value ?? "").replace(/[^\d]/g, "")) || 0;
+}
+
+/** Ngày hiện tại theo giờ Việt Nam (UTC+7), dạng YYYY-MM-DD */
+function todayVN() {
+  const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
+  return now.toISOString().slice(0, 10);
+}
+
+/**
+ * Ghi nhận một lần tương tác vào Google Sheets.
+ * Cột M = tổng lượt xem, N = lượt đọc trong ngày, O = click Shopee trong ngày, P = ngày của số liệu.
+ */
+async function bumpCounters(slug: string, kind: "view" | "click") {
+  const range = `${SHEET_NAME}!B2:P1000`;
+  const sheet = await callSheets(`/spreadsheets/${SHEET_ID}/values/${range}`);
+  const rows: string[][] = sheet.values ?? [];
+
+  const rowOffset = rows.findIndex((r) => (r?.[0] ?? "").trim() === slug);
+  if (rowOffset === -1) throw new Error(`Không tìm thấy truyện "${slug}" trong Google Sheets`);
+
+  const row = rows[rowOffset] ?? [];
+  const today = todayVN();
+  const sameDay = String(row[14] ?? "").trim().slice(0, 10) === today;
+
+  const totalViews = toNumber(row[11]) + (kind === "view" ? 1 : 0);
+  const baseViewsToday = sameDay ? toNumber(row[12]) : 0;
+  const baseClicksToday = sameDay ? toNumber(row[13]) : 0;
+  const viewsToday = baseViewsToday + (kind === "view" ? 1 : 0);
+  const clicksToday = baseClicksToday + (kind === "click" ? 1 : 0);
+
+  const cells = `${SHEET_NAME}!M${rowOffset + 2}:P${rowOffset + 2}`;
+  await callSheets(`/spreadsheets/${SHEET_ID}/values/${cells}?valueInputOption=USER_ENTERED`, {
+    method: "PUT",
+    body: JSON.stringify({
+      range: cells,
+      majorDimension: "ROWS",
+      values: [[totalViews, viewsToday, clicksToday, today]],
+    }),
+  });
+
+  return { views: totalViews, viewsToday, clicksToday };
+}
+
+/** Tăng lượt xem thật của truyện, trả về tổng lượt xem mới. */
 export const trackStoryView = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ slug: z.string().min(1).max(200) }).parse(data))
   .handler(async ({ data }): Promise<{ views: number }> => {
-    const range = `${SHEET_NAME}!B2:M1000`;
-    const sheet = await callSheets(`/spreadsheets/${SHEET_ID}/values/${range}`);
-    const rows: string[][] = sheet.values ?? [];
+    const result = await bumpCounters(data.slug, "view");
+    return { views: result.views };
+  });
 
-    // Dòng đầu tiên của truyện là dòng giữ lượt xem (cột B = slug, cột M = views)
-    const rowOffset = rows.findIndex((r) => (r?.[0] ?? "").trim() === data.slug);
-    if (rowOffset === -1) throw new Error(`Không tìm thấy truyện "${data.slug}" trong Google Sheets`);
-
-    const current = Number(String(rows[rowOffset]?.[11] ?? "").replace(/[^\d]/g, "")) || 0;
-    const views = current + 1;
-    const cell = `${SHEET_NAME}!M${rowOffset + 2}`;
-
-    await callSheets(`/spreadsheets/${SHEET_ID}/values/${cell}?valueInputOption=RAW`, {
-      method: "PUT",
-      body: JSON.stringify({ range: cell, majorDimension: "ROWS", values: [[views]] }),
-    });
-
-    return { views };
+/** Ghi nhận một lần click vào liên kết Shopee trong ngày. */
+export const trackShopeeClick = createServerFn({ method: "POST" })
+  .inputValidator((data) => z.object({ slug: z.string().min(1).max(200) }).parse(data))
+  .handler(async ({ data }): Promise<{ clicksToday: number }> => {
+    const result = await bumpCounters(data.slug, "click");
+    return { clicksToday: result.clicksToday };
   });

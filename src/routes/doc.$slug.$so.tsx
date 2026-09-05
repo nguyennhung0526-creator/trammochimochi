@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { storiesQueryOptions } from "@/lib/stories-query";
-import { trackStoryView } from "@/lib/views.functions";
+import { trackShopeeClick, trackStoryView } from "@/lib/views.functions";
 
 const GATED_CHAPTER = 2;
 
@@ -42,6 +42,7 @@ export const Route = createFileRoute("/doc/$slug/$so")({
 function Reader() {
   const { story, chapter } = Route.useLoaderData();
   const trackView = useServerFn(trackStoryView);
+  const trackClick = useServerFn(trackShopeeClick);
   const queryClient = useQueryClient();
 
   const prev = chapter.index > 1 ? chapter.index - 1 : null;
@@ -77,7 +78,15 @@ function Reader() {
           <span> / {chapter.title}</span>
         </nav>
         {locked && story.shopeeUrl ? (
-          <ShopeeGate onUnlock={() => setUnlocked(true)} url={story.shopeeUrl} />
+          <ShopeeGate
+            onUnlock={() => {
+              setUnlocked(true);
+              trackClick({ data: { slug: story.slug } }).catch((e) =>
+                console.error("Không ghi được click Shopee:", e),
+              );
+            }}
+            url={story.shopeeUrl}
+          />
         ) : (
           <article className="pastel-panel mt-4 p-5 sm:p-8">
             <h1 className="text-center text-xl font-bold md:text-2xl">
