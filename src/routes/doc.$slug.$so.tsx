@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ShopeeGate } from "@/components/ShopeeGate";
 import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
 import { storiesQueryOptions } from "@/lib/stories-query";
+import { getTrafficSource } from "@/lib/traffic-source";
 import { trackShopeeClick, trackStoryView } from "@/lib/views.functions";
 
 const GATED_CHAPTER = 2;
@@ -59,7 +60,7 @@ function Reader() {
     const key = `mochi-viewed:${story.slug}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
-    trackView({ data: { slug: story.slug } })
+    trackView({ data: { slug: story.slug, source: getTrafficSource() } })
       .then(() => queryClient.invalidateQueries({ queryKey: ["stories"] }))
       .catch((e) => console.error("Không ghi được lượt xem:", e));
   }, [story.slug, trackView, queryClient]);
@@ -81,7 +82,7 @@ function Reader() {
           <ShopeeGate
             onUnlock={() => {
               setUnlocked(true);
-              trackClick({ data: { slug: story.slug } }).catch((e) =>
+              trackClick({ data: { slug: story.slug, source: getTrafficSource() } }).catch((e) =>
                 console.error("Không ghi được click Shopee:", e),
               );
             }}
