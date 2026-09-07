@@ -73,21 +73,21 @@ async function bumpCounters(slug: string, kind: "view" | "click") {
 
 const DAILY_SHEET = "ThongKeNgay";
 
-type Source = "tiktok" | "facebook" | "khac";
-
 /**
- * Ghi nhận số liệu theo từng ngày vào trang tính ThongKeNgay:
- * A ngay | B slug | C ten_truyen | D luot_doc | E click_shopee
- * F tu_tiktok | G tu_facebook | H nguon_khac | I cap_nhat_luc
+ * Ghi nhận số liệu theo từng ngày và từng nguồn vào trang tính ThongKeNgay:
+ * A ngay | B slug | C ten_truyen | D nguon | E luot_doc | F click_shopee | G cap_nhat_luc
  */
-async function bumpDaily(slug: string, kind: "view" | "click", source: Source) {
+async function bumpDaily(slug: string, kind: "view" | "click", source: string) {
   const today = todayVN();
-  const range = `${DAILY_SHEET}!A2:I2000`;
+  const range = `${DAILY_SHEET}!A2:G5000`;
   const sheet = await callSheets(`/spreadsheets/${SHEET_ID}/values/${range}`);
   const rows: string[][] = sheet.values ?? [];
 
   const offset = rows.findIndex(
-    (r) => String(r?.[0] ?? "").trim().slice(0, 10) === today && String(r?.[1] ?? "").trim() === slug,
+    (r) =>
+      String(r?.[0] ?? "").trim().slice(0, 10) === today &&
+      String(r?.[1] ?? "").trim() === slug &&
+      String(r?.[3] ?? "").trim().toLowerCase() === source.toLowerCase(),
   );
   const existing = offset === -1 ? [] : (rows[offset] ?? []);
   const rowNumber = offset === -1 ? rows.length + 2 : offset + 2;
@@ -97,15 +97,13 @@ async function bumpDaily(slug: string, kind: "view" | "click", source: Source) {
     today,
     slug,
     existing[2] ?? "",
-    toNumber(existing[3]) + (kind === "view" ? 1 : 0),
-    toNumber(existing[4]) + (kind === "click" ? 1 : 0),
-    toNumber(existing[5]) + (kind === "view" && source === "tiktok" ? 1 : 0),
-    toNumber(existing[6]) + (kind === "view" && source === "facebook" ? 1 : 0),
-    toNumber(existing[7]) + (kind === "view" && source === "khac" ? 1 : 0),
+    source,
+    toNumber(existing[4]) + (kind === "view" ? 1 : 0),
+    toNumber(existing[5]) + (kind === "click" ? 1 : 0),
     now,
   ];
 
-  const cells = `${DAILY_SHEET}!A${rowNumber}:I${rowNumber}`;
+  const cells = `${DAILY_SHEET}!A${rowNumber}:G${rowNumber}`;
   await callSheets(`/spreadsheets/${SHEET_ID}/values/${cells}?valueInputOption=USER_ENTERED`, {
     method: "PUT",
     body: JSON.stringify({ range: cells, majorDimension: "ROWS", values: [values] }),
@@ -114,7 +112,7 @@ async function bumpDaily(slug: string, kind: "view" | "click", source: Source) {
 
 const inputSchema = z.object({
   slug: z.string().min(1).max(200),
-  source: z.enum(["tiktok", "facebook", "khac"]).optional(),
+  source: z.string().min(1).max(80).optional(),
 });
 
 /** Tăng lượt xem thật của truyện, trả về tổng lượt xem mới. */
@@ -122,7 +120,7 @@ export const trackStoryView = createServerFn({ method: "POST" })
   .inputValidator((data) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<{ views: number }> => {
     const result = await bumpCounters(data.slug, "view");
-    await bumpDaily(data.slug, "view", data.source ?? "khac").catch((e) =>
+    await bumpDaily(data.slug, "view", data.source ?? "Không xác định").catch((e) =>
       console.error("Không ghi được thống kê ngày:", e),
     );
     return { views: result.views };
@@ -133,8 +131,9 @@ export const trackShopeeClick = createServerFn({ method: "POST" })
   .inputValidator((data) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<{ clicksToday: number }> => {
     const result = await bumpCounters(data.slug, "click");
-    await bumpDaily(data.slug, "click", data.source ?? "khac").catch((e) =>
+    await bumpDaily(data.slug, "click", data.source ?? "Không xác định").catch((e) =>
       console.error("Không ghi được thống kê ngày:", e),
     );
     return { clicksToday: result.clicksToday };
   });
+
