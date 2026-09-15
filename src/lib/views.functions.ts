@@ -57,6 +57,7 @@ async function bumpCounters(slug: string, kind: "view" | "click") {
   const baseClicksToday = sameDay ? toNumber(row[13]) : 0;
   const viewsToday = baseViewsToday + (kind === "view" ? 1 : 0);
   const clicksToday = baseClicksToday + (kind === "click" ? 1 : 0);
+  const title = String(row[1] ?? "").trim() || slug;
 
   const cells = `${SHEET_NAME}!M${rowOffset + 2}:P${rowOffset + 2}`;
   await callSheets(`/spreadsheets/${SHEET_ID}/values/${cells}?valueInputOption=USER_ENTERED`, {
@@ -68,39 +69,59 @@ async function bumpCounters(slug: string, kind: "view" | "click") {
     }),
   });
 
-  return { views: totalViews, viewsToday, clicksToday };
+  return { views: totalViews, viewsToday, clicksToday, title };
 }
 
 const DAILY_SHEET = "ThongKeNgay";
 
 /**
- * Ghi nhận số liệu theo từng ngày và từng nguồn vào trang tính ThongKeNgay:
- * A ngay | B slug | C ten_truyen | D nguon | E luot_doc | F click_shopee | G cap_nhat_luc
+ * Ghi nhận số liệu theo từng ngày vào trang tính ThongKeNgay.
+ * Mẫu trình bày: mỗi ngày chỉ một ô ngày (các dòng cùng ngày bên dưới để trống),
+ * mỗi dòng là một truyện. Nguồn gộp trong một ô, dạng "TikTok: 2; Facebook: 1".
+ * A ngay | B ten_truyen | C luot_doc | D click_shopee | E nguon | F cap_nhat_luc | G slug
  */
-async function bumpDaily(slug: string, kind: "view" | "click", source: string) {
+function mergeSource(existing: string, source: string) {
+  const map = new Map<string, number>();
+  for (const part of existing.split(";")) {
+    const m = part.trim().match(/^(.*):\s*(\d+)$/);
+    if (m) map.set(m[1].trim(), Number(m[2]));
+  }
+  map.set(source, (map.get(source) ?? 0) + 1);
+  return [...map.entries()].map(([name, count]) => `${name}: ${count}`).join("; ");
+}
+
+async function bumpDaily(slug: string, title: string, kind: "view" | "click", source: string) {
   const today = todayVN();
   const range = `${DAILY_SHEET}!A2:G5000`;
   const sheet = await callSheets(`/spreadsheets/${SHEET_ID}/values/${range}`);
   const rows: string[][] = sheet.values ?? [];
 
-  const offset = rows.findIndex(
-    (r) =>
-      String(r?.[0] ?? "").trim().slice(0, 10) === today &&
-      String(r?.[1] ?? "").trim() === slug &&
-      String(r?.[3] ?? "").trim().toLowerCase() === source.toLowerCase(),
-  );
+  // Ô ngày chỉ ghi ở dòng đầu mỗi ngày, nên phải lần theo ngày gần nhất phía trên
+  let lastDate = "";
+  let offset = -1;
+  let hasToday = false;
+  rows.forEach((r, i) => {
+    const cellDate = String(r?.[0] ?? "").trim().slice(0, 10);
+    if (cellDate) lastDate = cellDate;
+    if (lastDate !== today) return;
+    hasToday = true;
+    const rowSlug = String(r?.[6] ?? "").trim();
+    const rowTitle = String(r?.[1] ?? "").trim();
+    if (offset === -1 && (rowSlug === slug || (!rowSlug && rowTitle === title))) offset = i;
+  });
+
   const existing = offset === -1 ? [] : (rows[offset] ?? []);
   const rowNumber = offset === -1 ? rows.length + 2 : offset + 2;
   const now = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(11, 16);
 
   const values = [
-    today,
-    slug,
-    existing[2] ?? "",
-    source,
-    toNumber(existing[4]) + (kind === "view" ? 1 : 0),
-    toNumber(existing[5]) + (kind === "click" ? 1 : 0),
+    offset === -1 ? (hasToday ? "" : today) : (existing[0] ?? ""),
+    existing[1] || title,
+    toNumber(existing[2]) + (kind === "view" ? 1 : 0),
+    toNumber(existing[3]) + (kind === "click" ? 1 : 0),
+    mergeSource(String(existing[4] ?? ""), source),
     now,
+    existing[6] || slug,
   ];
 
   const cells = `${DAILY_SHEET}!A${rowNumber}:G${rowNumber}`;
@@ -120,7 +141,7 @@ export const trackStoryView = createServerFn({ method: "POST" })
   .inputValidator((data) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<{ views: number }> => {
     const result = await bumpCounters(data.slug, "view");
-    await bumpDaily(data.slug, "view", data.source ?? "Không xác định").catch((e) =>
+    await bumpDaily(data.slug, result.title, "view", data.source ?? "Không xác định").catch((e) =>
       console.error("Không ghi được thống kê ngày:", e),
     );
     return { views: result.views };
@@ -131,7 +152,7 @@ export const trackShopeeClick = createServerFn({ method: "POST" })
   .inputValidator((data) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<{ clicksToday: number }> => {
     const result = await bumpCounters(data.slug, "click");
-    await bumpDaily(data.slug, "click", data.source ?? "Không xác định").catch((e) =>
+    await bumpDaily(data.slug, result.title, "click", data.source ?? "Không xác định").catch((e) =>
       console.error("Không ghi được thống kê ngày:", e),
     );
     return { clicksToday: result.clicksToday };
