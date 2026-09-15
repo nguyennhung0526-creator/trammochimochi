@@ -8,9 +8,11 @@ export function ShopeeGate({ onUnlock, url }: { onUnlock: () => void; url: strin
   const shopeeUrl = url;
 
   const openShopee = () => {
-    // Mở trong tab mới — trên điện thoại, link Shopee sẽ tự chuyển sang app Shopee.
-    window.open(shopeeUrl, "_blank", "noopener,noreferrer");
     onUnlock();
+    // Điều hướng thẳng tab hiện tại tới link Shopee: iOS (universal link) và
+    // Android (App Links) sẽ tự bắt link và mở thẳng app Shopee đã cài trên máy.
+    // Nếu máy chưa cài app, trình duyệt sẽ mở trang Shopee như bình thường.
+    window.location.assign(shopeeUrl);
   };
 
   return (
