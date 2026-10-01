@@ -22,7 +22,7 @@ export const Route = createFileRoute("/the-loai/$ten")({
   }),
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-muted-foreground">
-      Không tải được danh sách truyện: {error.message}
+      Không tải được danh sách truyện: {(error as Error).message}
     </div>
   ),
   notFoundComponent: () => (

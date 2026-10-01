@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(storiesQueryOptions),
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-muted-foreground">
-      Không tải được kho truyện: {error.message}
+      Không tải được kho truyện: {(error as Error).message}
     </div>
   ),
   pendingComponent: () => (
