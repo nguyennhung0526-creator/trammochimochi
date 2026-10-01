@@ -27,7 +27,7 @@ export const Route = createFileRoute("/the-loai/")({
   }),
   errorComponent: ({ error }) => (
     <div role="alert" className="p-8 text-sm text-muted-foreground">
-      Không tải được danh sách thể loại: {error.message}
+      Không tải được danh sách thể loại: {(error as Error).message}
     </div>
   ),
   notFoundComponent: () => (
