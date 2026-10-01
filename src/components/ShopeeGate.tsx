@@ -9,10 +9,20 @@ export function ShopeeGate({ onUnlock, url }: { onUnlock: () => void; url: strin
 
   const openShopee = () => {
     onUnlock();
-    // Điều hướng thẳng tab hiện tại tới link Shopee: iOS (universal link) và
-    // Android (App Links) sẽ tự bắt link và mở thẳng app Shopee đã cài trên máy.
-    // Nếu máy chưa cài app, trình duyệt sẽ mở trang Shopee như bình thường.
-    window.location.assign(shopeeUrl);
+    // Thử mở thẳng app Shopee đã đăng nhập bằng Custom URL Scheme
+    // (shopee://...) — hoạt động cả trong webview TikTok nơi link https
+    // thường bị kẹt. Nếu sau 1.2s app không bật (máy chưa cài Shopee),
+    // tự chuyển sang đường dẫn web HTTPS mặc định.
+    const schemeUrl = shopeeUrl.replace(/^https?:\/\//, "shopee://");
+    const start = Date.now();
+    const fallback = window.setTimeout(() => {
+      // Trang vẫn hiển thị => app không mở được => mở bản web
+      if (Date.now() - start < 2000) window.location.assign(shopeeUrl);
+    }, 1200);
+    const cancel = () => window.clearTimeout(fallback);
+    window.addEventListener("pagehide", cancel, { once: true });
+    document.addEventListener("visibilitychange", cancel, { once: true });
+    window.location.assign(schemeUrl);
   };
 
   return (

@@ -84,7 +84,7 @@ function mergeSource(existing: string, source: string) {
   const map = new Map<string, number>();
   for (const part of existing.split(";")) {
     const m = part.trim().match(/^(.*):\s*(\d+)$/);
-    if (m) map.set(m[1].trim(), Number(m[2]));
+    if (m) map.set(m[1]!.trim(), Number(m[2]));
   }
   map.set(source, (map.get(source) ?? 0) + 1);
   return [...map.entries()].map(([name, count]) => `${name}: ${count}`).join("; ");
